@@ -77,13 +77,12 @@ if ~isOctave
         % expected_result_online=[...%0=no test, 1=succes, 2=fail, 3=error
         %     2 1 0;...%ANSI;  many chars, <255, all chars
         %     2 2 2];  %UTF-8; many chars, <255, all chars
-    elseif ifversion('<=','R2011a')
+    elseif isunix && ~ismac
         expected_result_offline=[...%0=no test, 1=succes, 2=fail, 3=error
-            1 1 0;...%ANSI;  many chars, <255, all chars
-            1 1 1];  %UTF-8; many chars, <255, all chars
-        expected_result_online=[...%0=no test, 1=succes, 2=fail, 3=error
             2 2 0;...%ANSI;  many chars, <255, all chars
             1 1 1];  %UTF-8; many chars, <255, all chars
+        %online has same support as offline
+        expected_result_online=expected_result_offline;
     else
         expected_result_offline=[...%0=no test, 1=succes, 2=fail, 3=error
             1 1 0;...%ANSI;  many chars, <255, all chars
@@ -222,23 +221,24 @@ function data=readfile(filename)
 % accident'. (Note that this paragraph was true in early 2020, so a big update to Octave may have
 % added support by now. Although, don't hold your breath.)
 %
-%  _________________________________________________________________
-% | Compatibility | Windows 10  | Ubuntu 20.04 LTS | MacOS Catalina |
-% |---------------|-------------|------------------|----------------|
-% | ML R2020a     |  works      |  not tested      |  not tested    |
-% | ML R2015a     |  works      |  not tested      |  not tested    |
-% | ML R2011a     |  partial #3 |  not tested      |  not tested    |
-% | ML 6.5 (R13)  |  partial #2 |  not tested      |  not tested    |
-% | Octave 5.2.0  |  partial #1 |  partial #1      |  not tested    |
-% | Octave 4.4.1  |  partial #1 |  not tested      |  partial #1    |
-% """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+%  _______________________________________________________________________
+% | Compatibility | Windows 10  | Ubuntu 20.04 LTS | MacOS 10.15 Catalina |
+% |---------------|-------------|------------------|----------------------|
+% | ML R2020a     |  works      |  not tested      |  not tested          |
+% | ML R2018a     |  works      |  partial #3      |  not tested          |
+% | ML R2015a     |  works      |  partial #3      |  not tested          |
+% | ML R2011a     |  works      |  partial #3      |  not tested          |
+% | ML 6.5 (R13)  |  partial #2 |  not tested      |  not tested          |
+% | Octave 5.2.0  |  partial #1 |  partial #1      |  not tested          |
+% | Octave 4.4.1  |  partial #1 |  not tested      |  partial #1          |
+% """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 % note #1: no support for char>255 (which are likely converted to 0)
 % note #2: - no support for char>255 ANSI (unpredictable output)
-%          - online (without download): may work as expected, but only ANSI<256 is fully supported
-% note #3: online (without download): ANSI files may not work
+%          - online (without download): could fail for files that aren't ANSI<256
+% note #3: ANSI>127 chars are converted to 65533
 %
-% Version: 2.0
-% Date:    2020-06-28
+% Version: 2.0.1
+% Date:    2020-07-03
 % Author:  H.J. Wisselink
 % Licence: CC by-nc-sa 4.0 ( creativecommons.org/licenses/by-nc-sa/4.0 )
 % Email=  'h_j_wisselink*alumnus_utwente_nl';
@@ -344,6 +344,10 @@ if ~isOctave
             end
         end
     end
+    if numel(str)>=1 && double(str(1))==65279
+        %remove UTF BOM (U+FEFF) from text
+        str(1)='';
+    end
     str(str==13)='';
     if legacy.split
         s1=strfind(str,char(10));s2=s1;%#ok<CHARTEN>
@@ -415,7 +419,7 @@ function str=URL_to_str(url,UseURLread)
 %If that fails, read to a char array with urlread/webread.
 try
     %Generate a random file name in the temp folder
-    [fn_1,fn_2]=fileparts(tempname);fn=fullfile(fn_1,['readfile_from_URL_tmp_' fn_2 '.txt']);
+    fn=tmpname('readfile_from_URL_tmp_','.txt');
     try
         RevertToUrlread=false;%in case the saving+reading fails
         
@@ -435,7 +439,7 @@ try
 catch
     %Read to a char array and let these functions throw an error in case of HTML errors and/or
     %missing connectivity.
-    if UseURLread,str=urlread(filename);else,str=webread(filename);end %#ok<URLRD>
+    if UseURLread,str=urlread(url);else,str=webread(url);end %#ok<URLRD>
 end
 end
 function tf=ifversion(test,Rxxxxab,Oct_flag,Oct_test,Oct_ver)
@@ -924,6 +928,15 @@ if any(byte2)
         end
     end
 end
+end
+function str=tmpname(StartFilenameWith,ext)
+%inject a string in the file name part returned by the tempname function
+if nargin<1,StartFilenameWith='';end
+if ~isempty(StartFilenameWith),StartFilenameWith=[StartFilenameWith '_'];end
+if nargin<2,ext='';else,if ~strcmp(ext(1),'.'),ext=['.' ext];end,end
+str=tempname;
+[p,f]=fileparts(str);
+str=fullfile(p,[StartFilenameWith f ext]);
 end
 function [connected,timing]=isnetavl___ping_via_html
 %Ping is blocked by some organizations. As an alternative, the google.com page can be loaded as a
