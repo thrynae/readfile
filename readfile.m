@@ -1,5 +1,5 @@
 function data=readfile(filename)
-%Read a UTF8 or ANSI (US-ASCII) file
+%Read a UTF-8 or ANSI (US-ASCII) file
 %
 % Syntax:
 %    data=readfile(filename)
@@ -8,10 +8,10 @@ function data=readfile(filename)
 %
 % This function is aimed at providing a reliable method of reading a file. The backbone of this
 % function is the fileread function. Further processing is done to attempt to detect if the file is
-% UTF8 or not, apply the transcoding and returning the file as an n-by-1 cell array for files with
+% UTF-8 or not, apply the transcoding and returning the file as an n-by-1 cell array for files with
 % n lines.
 %
-% The test for being UTF8 can fail. For files with chars in the 128:255 range, the test will often
+% The test for being UTF-8 can fail. For files with chars in the 128:255 range, the test will often
 % determine the encoding correctly, but it might fail. Online files are much more limited than
 % offline files. To avoid this the files are downloaded to tempdir() and deleted after reading. 
 %
@@ -38,11 +38,11 @@ function data=readfile(filename)
 %          - online (without download): could fail for files that aren't ANSI<256
 % note #3: ANSI>127 chars are converted to 65533
 %
-% Version: 2.0.1
-% Date:    2020-07-03
+% Version: 2.0.2
+% Date:    2020-09-05
 % Author:  H.J. Wisselink
 % Licence: CC by-nc-sa 4.0 ( creativecommons.org/licenses/by-nc-sa/4.0 )
-% Email=  'h_j_wisselink*alumnus_utwente_nl';
+% Email = 'h_j_wisselink*alumnus_utwente_nl';
 % Real_email = regexprep(Email,{'*','_'},{'@','.'})
 
 % Tested with 3 files with the following chars:
@@ -88,14 +88,14 @@ if ... %enumerate all possible incorrect inputs
         'The file name must be a non-empty char or a scalar string.')
 end
 if isa(filename,'string'),filename=char(filename);end
-if numel(filename)>=8 && strcmp(filename(1:7),'http://') || strcmp(filename(1:8),'https://')
+if numel(filename)>=8 && ( strcmp(filename(1:7),'http://') || strcmp(filename(1:8),'https://') )
     isURL=true;
     if ~legacy.allows_https && strcmp(filename(1:8),'https://')
         warning('HJW:readfile:httpsNotSupported',...
             ['This implementation of urlread probably doesn''t allow https requests.',char(10),...
             'The next lines of code will probably result in an error.']) %#ok<CHARTEN>
     end
-    str=URL_to_str(filename,legacy.UseURLread);
+    str=readfile_URL_to_str(filename,legacy.UseURLread);
     if isa(str,'cell') %file was read from temporary downloaded version
         data=str;return
     end
@@ -114,7 +114,7 @@ if ~isOctave
     end
     if ispc
         str_original=str;%make a backup
-        %Convert from the Windows-1252 codepage (the default on a Windows machine) to UTF8
+        %Convert from the Windows-1252 codepage (the default on a Windows machine) to UTF-8
         try
             [a,b]=ismember(str,origin);
             str(a)=target(b(a));
@@ -137,7 +137,7 @@ if ~isOctave
             %ML6.5 doesn't support the "catch ME" syntax
             ME=lasterror;%#ok<LERR>
             if strcmp(ME.identifier,'HJW:UTF8_to_str:notUTF8')
-                %Apparently it is not a UTF8 file, as the converter failed, so undo the
+                %Apparently it is not a UTF-8 file, as the converter failed, so undo the
                 %Windows-1252 codepage re-mapping.
                 str=str_original;
             else
@@ -204,7 +204,7 @@ else
         end
     catch ME
         if strcmp(ME.identifier,'HJW:UTF8_to_str:notUTF8')
-            %Apparently it is not a UTF8 file, as the converter failed, so undo the Windows-1252
+            %Apparently it is not a UTF-8 file, as the converter failed, so undo the Windows-1252
             %codepage re-mapping.
             data=data_original;
         else
@@ -213,7 +213,137 @@ else
     end
 end
 end
-function str=URL_to_str(url,UseURLread)
+function tf=ifversion(test,Rxxxxab,Oct_flag,Oct_test,Oct_ver)
+%Determine if the current version satisfies a version restriction
+%
+% To keep the function fast, no input checking is done. This function returns a NaN if a release
+% name is used that is not in the dictionary.
+%
+% Syntax:
+% tf=ifversion(test,Rxxxxab)
+% tf=ifversion(test,Rxxxxab,'Octave',test_for_Octave,v_Octave)
+%
+% Output:
+% tf       - If the current version satisfies the test this returns true.
+%            This works similar to verLessThan.
+%
+% Inputs:
+% Rxxxxab - Char array containing a release description (e.g. 'R13', 'R14SP2' or 'R2019a') or the
+%           numeric version.
+% test    - Char array containing a logical test. The interpretation of this is equivalent to
+%           eval([current test Rxxxxab]). For examples, see below.
+%
+% Examples:
+% ifversion('>=','R2009a') returns true when run on R2009a or later
+% ifversion('<','R2016a') returns true when run on R2015b or older
+% ifversion('==','R2018a') returns true only when run on R2018a
+% ifversion('==',9.8) returns true only when run on R2020a
+% ifversion('<',0,'Octave','>',0) returns true only on Octave
+%
+% The conversion is based on a manual list and therefore needs to be updated manually, so it might
+% not be complete. Although it should be possible to load the list from Wikipedia, this is not
+% implemented.
+%
+%  _______________________________________________________________________
+% | Compatibility | Windows 10  | Ubuntu 20.04 LTS | MacOS 10.15 Catalina |
+% |---------------|-------------|------------------|----------------------|
+% | ML R2020a     |  works      |  not tested      |  not tested          |
+% | ML R2018a     |  works      |  works           |  not tested          |
+% | ML R2015a     |  works      |  works           |  not tested          |
+% | ML R2011a     |  works      |  works           |  not tested          |
+% | ML 6.5 (R13)  |  works      |  not tested      |  not tested          |
+% | Octave 5.2.0  |  works      |  works           |  not tested          |
+% | Octave 4.4.1  |  works      |  not tested      |  works               |
+% """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+%
+% Version: 1.0.2
+% Date:    2020-05-20
+% Author:  H.J. Wisselink
+% Licence: CC by-nc-sa 4.0 ( creativecommons.org/licenses/by-nc-sa/4.0 )
+% Email = 'h_j_wisselink*alumnus_utwente_nl';
+% Real_email = regexprep(Email,{'*','_'},{'@','.'})
+
+%The decimal of the version numbers are padded with a 0 to make sure v7.10 is larger than v7.9.
+%This does mean that any numeric version input needs to be adapted. multiply by 100 and round to
+%remove the potential for float rounding errors.
+%Store in persistent for fast recall (don't use getpref, as that is slower than generating the
+%variables and makes updating this function harder).
+persistent  v_num v_dict octave
+if isempty(v_num)
+    %test if Octave is used instead of Matlab
+    octave=exist('OCTAVE_VERSION', 'builtin');
+    
+    %get current version number
+    v_num=version;
+    ii=strfind(v_num,'.');
+    if numel(ii)~=1,v_num(ii(2):end)='';ii=ii(1);end
+    v_num=[str2double(v_num(1:(ii-1))) str2double(v_num((ii+1):end))];
+    v_num=v_num(1)+v_num(2)/100;
+    v_num=round(100*v_num);%remove float rounding errors
+    
+    %get dictionary to use for ismember
+    v_dict={...
+        'R13' 605;'R13SP1' 605;'R13SP2' 605;'R14' 700;'R14SP1' 700;'R14SP2' 700;'R14SP3' 701;...
+        'R2006a' 702;'R2006b' 703;'R2007a' 704;'R2007b' 705;'R2008a' 706;'R2008b' 707;...
+        'R2009a' 708;'R2009b' 709;'R2010a' 710;'R2010b' 711;'R2011a' 712;'R2011b' 713;...
+        'R2012a' 714;'R2012b' 800;'R2013a' 801;'R2013b' 802;'R2014a' 803;'R2014b' 804;...
+        'R2015a' 805;'R2015b' 806;'R2016a' 900;'R2016b' 901;'R2017a' 902;'R2017b' 903;...
+        'R2018a' 904;'R2018b' 905;'R2019a' 906;'R2019b' 907;'R2020a' 908};
+end
+
+if octave
+    if nargin==2
+        warning('HJW:ifversion:NoOctaveTest',...
+            ['No version test for Octave was provided.',char(10),...
+            'This function might return an unexpected outcome.']) %#ok<CHARTEN>
+        %Use the same test as for Matlab, which will probably fail.
+        L=ismember(v_dict(:,1),Rxxxxab);
+        if sum(L)~=1
+            warning('HJW:ifversion:NotInDict',...
+                'The requested version is not in the hard-coded list.')
+            tf=NaN;return
+        else
+            v=v_dict{L,2};
+        end
+    elseif nargin==4
+        %undocumented shorthand syntax: skip the 'Octave' argument
+        [test,v]=deal(Oct_flag,Oct_test);
+        %convert 4.1 to 401
+        v=0.1*v+0.9*fix(v);v=round(100*v);
+    else
+        [test,v]=deal(Oct_test,Oct_ver);
+        %convert 4.1 to 401
+        v=0.1*v+0.9*fix(v);v=round(100*v);
+    end
+else
+    %convert R notation to numeric and convert 9.1 to 901
+    if isnumeric(Rxxxxab)
+        v=0.1*Rxxxxab+0.9*fix(Rxxxxab);v=round(100*v);
+    else
+        L=ismember(v_dict(:,1),Rxxxxab);
+        if sum(L)~=1
+            warning('HJW:ifversion:NotInDict',...
+                'The requested version is not in the hard-coded list.')
+            tf=NaN;return
+        else
+            v=v_dict{L,2};
+        end
+    end
+end
+switch test
+    case '=='
+        tf= v_num == v;
+    case '<'
+        tf= v_num <  v;
+    case '<='
+        tf= v_num <= v;
+    case '>'
+        tf= v_num >  v;
+    case '>='
+        tf= v_num >= v;
+end
+end
+function str=readfile_URL_to_str(url,UseURLread)
 %Read the contents of a file to a char array.
 %
 %Attempt to download to the temp folder, read the file, then delete it.
@@ -243,6 +373,84 @@ catch
     if UseURLread,str=urlread(url);else,str=webread(url);end %#ok<URLRD>
 end
 end
+function ThrowErrorIfNotUTF8file(str)
+%Test if the char input is likely to be UTF8
+%
+%This uses the same tests as the UTF8_to_str function.
+%Octave has poor support for chars >255, but that is ignored in this function.
+
+if any(str>255)
+    error('HJW:UTF8_to_str:notUTF8','Input is not UTF8')
+end
+str=char(str);
+
+%Matlab doesn't support 4-byte chars in the same way as 1-3 byte chars. So we ignore them and start
+%with the 3-byte chars (starting with 1110xxxx).
+val_byte3=bin2dec('11100000');
+byte3=str>=val_byte3;
+if any(byte3)
+    byte3=find(byte3)';
+    try
+        byte3=str([byte3 (byte3+1) (byte3+2)]);
+    catch
+        if numel(str)<(max(byte3)+2)
+            error('HJW:UTF8_to_str:notUTF8','Input is not UTF8')
+        else
+            rethrow(lasterror) %#ok<LERR> no "catch ME" syntax in ML6.5
+        end
+    end
+    byte3=unique(byte3,'rows');
+    S2=mat2cell(char(byte3),ones(size(byte3,1),1),3);
+    for n=1:numel(S2)
+        bin=dec2bin(double(S2{n}))';
+        %To view the binary data, you can use this: bin=bin(:)';
+        %Remove binary header:
+        %1110xxxx10xxxxxx10xxxxxx
+        %    xxxx  xxxxxx  xxxxxx
+        if ~strcmp('11101010',bin([1 2 3 4 8+1 8+2 16+1 16+2]))
+            %Check if the byte headers match the UTF8 standard
+            error('HJW:UTF8_to_str:notUTF8','Input is not UTF8')
+        end
+    end
+end
+%Next, the 2-byte chars (starting with 110xxxxx)
+val_byte2=bin2dec('11000000');
+byte2=str>=val_byte2 & str<val_byte3;%Exclude the already checked chars
+if any(byte2)
+    byte2=find(byte2)';
+    try
+        byte2=str([byte2 (byte2+1)]);
+    catch
+        if numel(str)<(max(byte2)+1)
+            error('HJW:UTF8_to_str:notUTF8','Input is not UTF8')
+        else
+            rethrow(lasterror) %#ok<LERR> no "catch ME" syntax in ML6.5
+        end
+    end
+    byte2=unique(byte2,'rows');
+    S2=mat2cell(byte2,ones(size(byte2,1),1),2);
+    for n=1:numel(S2)
+        bin=dec2bin(double(S2{n}))';
+        %To view the binary data, you can use this: bin=bin(:)';
+        %Remove binary header:
+        %110xxxxx10xxxxxx
+        %   xxxxx  xxxxxx
+        if ~strcmp('11010',bin([1 2 3 8+1 8+2]))
+            %Check if the byte headers match the UTF8 standard
+            error('HJW:UTF8_to_str:notUTF8','Input is not UTF8')
+        end
+    end
+end
+end
+function str=tmpname(StartFilenameWith,ext)
+%Inject a string in the file name part returned by the tempname function.
+if nargin<1,StartFilenameWith='';end
+if ~isempty(StartFilenameWith),StartFilenameWith=[StartFilenameWith '_'];end
+if nargin<2,ext='';else,if ~strcmp(ext(1),'.'),ext=['.' ext];end,end
+str=tempname;
+[p,f]=fileparts(str);
+str=fullfile(p,[StartFilenameWith f ext]);
+end
 function [unicode,flag]=UTF8_to_str(UTF8,behavior__char_geq256,ResetOutputFlag)
 %Convert UTF8 to actual char values
 %
@@ -258,7 +466,7 @@ function [unicode,flag]=UTF8_to_str(UTF8,behavior__char_geq256,ResetOutputFlag)
 %to see if there is a char>255. If that was the case, the state field will be set to true. This
 %variable also contains an ME struct.
 %With the level set to 2 you can retrieve a similar variable with
-%getpref('HJW','UTF8_to_str___error_was_triggered'). These will not overwrite eachother.
+%getpref('HJW','UTF8_to_str___error_was_triggered'). These will not overwrite each other.
 %
 %This struct is also returned as the second output variable.
 
@@ -301,7 +509,7 @@ if isOctave
     end
     if behavior__char_geq256==1
         %Overwrite persistent variable with the contents of the global. This ensures changes made
-        %to this variable outside this function are not overwriten.
+        %to this variable outside this function are not overwritten.
         pref=HJW___UTF8_to_str___error_was_triggered;
     end
     
@@ -440,211 +648,4 @@ if any(byte2)
 end
 unicode=UTF8;
 flag=pref;
-end
-function ThrowErrorIfNotUTF8file(str)
-%Test if the char input is likely to be UTF8
-%
-%This uses the same tests as the UTF8_to_str function.
-%Octave has poor support for chars >255, but that is ignored in this function.
-
-if any(str>255)
-    error('HJW:UTF8_to_str:notUTF8','Input is not UTF8')
-end
-str=char(str);
-
-%Matlab doesn't support 4-byte chars in the same way as 1-3 byte chars. So we ignore them and start
-%with the 3-byte chars (starting with 1110xxxx).
-val_byte3=bin2dec('11100000');
-byte3=str>=val_byte3;
-if any(byte3)
-    byte3=find(byte3)';
-    try
-        byte3=str([byte3 (byte3+1) (byte3+2)]);
-    catch
-        if numel(str)<(max(byte3)+2)
-            error('HJW:UTF8_to_str:notUTF8','Input is not UTF8')
-        else
-            rethrow(lasterror) %#ok<LERR> no "catch ME" syntax in ML6.5
-        end
-    end
-    byte3=unique(byte3,'rows');
-    S2=mat2cell(char(byte3),ones(size(byte3,1),1),3);
-    for n=1:numel(S2)
-        bin=dec2bin(double(S2{n}))';
-        %To view the binary data, you can use this: bin=bin(:)';
-        %Remove binary header:
-        %1110xxxx10xxxxxx10xxxxxx
-        %    xxxx  xxxxxx  xxxxxx
-        if ~strcmp('11101010',bin([1 2 3 4 8+1 8+2 16+1 16+2]))
-            %Check if the byte headers match the UTF8 standard
-            error('HJW:UTF8_to_str:notUTF8','Input is not UTF8')
-        end
-    end
-end
-%Next, the 2-byte chars (starting with 110xxxxx)
-val_byte2=bin2dec('11000000');
-byte2=str>=val_byte2 & str<val_byte3;%Exclude the already checked chars
-if any(byte2)
-    byte2=find(byte2)';
-    try
-        byte2=str([byte2 (byte2+1)]);
-    catch
-        if numel(str)<(max(byte2)+1)
-            error('HJW:UTF8_to_str:notUTF8','Input is not UTF8')
-        else
-            rethrow(lasterror) %#ok<LERR> no "catch ME" syntax in ML6.5
-        end
-    end
-    byte2=unique(byte2,'rows');
-    S2=mat2cell(byte2,ones(size(byte2,1),1),2);
-    for n=1:numel(S2)
-        bin=dec2bin(double(S2{n}))';
-        %To view the binary data, you can use this: bin=bin(:)';
-        %Remove binary header:
-        %110xxxxx10xxxxxx
-        %   xxxxx  xxxxxx
-        if ~strcmp('11010',bin([1 2 3 8+1 8+2]))
-            %Check if the byte headers match the UTF8 standard
-            error('HJW:UTF8_to_str:notUTF8','Input is not UTF8')
-        end
-    end
-end
-end
-function tf=ifversion(test,Rxxxxab,Oct_flag,Oct_test,Oct_ver)
-%Determine if the current version satisfies a version restriction
-%
-% To keep the function fast, no input checking is done. This function returns a NaN if a release
-% name is used that is not in the dictionary.
-%
-% Syntax:
-% tf=ifversion(test,Rxxxxab)
-% tf=ifversion(test,Rxxxxab,'Octave',test_for_Octave,v_Octave)
-%
-% Output:
-% tf       - If the current version satisfies the test this returns true.
-%            This works similar to verLessThan.
-%
-% Inputs:
-% Rxxxxab - Char array containing a release description (e.g. 'R13', 'R14SP2' or 'R2019a') or the
-%           numeric version.
-% test    - Char array containing a logical test. The interpretation of this is equivalent to
-%           eval([current test Rxxxxab]). For examples, see below.
-%
-% Examples:
-% ifversion('>=','R2009a') returns true when run on R2009a or later
-% ifversion('<','R2016a') returns true when run on R2015b or older
-% ifversion('==','R2018a') returns true only when run on R2018a
-% ifversion('==',9.8) returns true only when run on R2020a
-% ifversion('<',0,'Octave','>',0) returns true only on Octave
-%
-% The conversion is based on a manual list and therefore needs to be updated manually, so it might
-% not be complete. Although it should be possible to load the list from Wikipedia, this is not
-% implemented.
-%
-%  _________________________________________________________________
-% | Compatibility | Windows 10  | Ubuntu 20.04 LTS | MacOS Catalina |
-% |---------------|-------------|------------------|----------------|
-% | ML R2020a     |  works      |  not tested      |  not tested    |
-% | ML R2015b     |  works      |  not tested      |  not tested    |
-% | ML R2011a     |  works      |  not tested      |  not tested    |
-% | ML 6.5 (R13)  |  works      |  not tested      |  not tested    |
-% | Octave 5.2.0  |  works      |  works           |  not tested    |
-% | Octave 4.4.1  |  works      |  not tested      |  works         |
-% """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-%
-% Version: 1.0.2
-% Date:    2020-05-20
-% Author:  H.J. Wisselink
-% Licence: CC by-nc-sa 4.0 ( creativecommons.org/licenses/by-nc-sa/4.0 )
-% Email=  'h_j_wisselink*alumnus_utwente_nl';
-% Real_email = regexprep(Email,{'*','_'},{'@','.'})
-
-%The decimal of the version numbers are padded with a 0 to make sure v7.10 is larger than v7.9.
-%This does mean that any numeric version input needs to be adapted. multiply by 100 and round to
-%remove the potential for float rounding errors.
-%Store in persistent for fast recall (don't use getpref, as that is slower than generating the
-%variables and makes updating this function harder).
-persistent  v_num v_dict octave
-if isempty(v_num)
-    %test if Octave is used instead of Matlab
-    octave=exist('OCTAVE_VERSION', 'builtin');
-    
-    %get current version number
-    v_num=version;
-    ii=strfind(v_num,'.');
-    if numel(ii)~=1,v_num(ii(2):end)='';ii=ii(1);end
-    v_num=[str2double(v_num(1:(ii-1))) str2double(v_num((ii+1):end))];
-    v_num=v_num(1)+v_num(2)/100;
-    v_num=round(100*v_num);%remove float rounding errors
-    
-    %get dictionary to use for ismember
-    v_dict={...
-        'R13' 605;'R13SP1' 605;'R13SP2' 605;'R14' 700;'R14SP1' 700;'R14SP2' 700;'R14SP3' 701;...
-        'R2006a' 702;'R2006b' 703;'R2007a' 704;'R2007b' 705;'R2008a' 706;'R2008b' 707;...
-        'R2009a' 708;'R2009b' 709;'R2010a' 710;'R2010b' 711;'R2011a' 712;'R2011b' 713;...
-        'R2012a' 714;'R2012b' 800;'R2013a' 801;'R2013b' 802;'R2014a' 803;'R2014b' 804;...
-        'R2015a' 805;'R2015b' 806;'R2016a' 900;'R2016b' 901;'R2017a' 902;'R2017b' 903;...
-        'R2018a' 904;'R2018b' 905;'R2019a' 906;'R2019b' 907;'R2020a' 908};
-end
-
-if octave
-    if nargin==2
-        warning('HJW:ifversion:NoOctaveTest',...
-            ['No version test for Octave was provided.',char(10),...
-            'This function might return an unexpected outcome.']) %#ok<CHARTEN>
-        %Use the same test as for Matlab, which will probably fail.
-        L=ismember(v_dict(:,1),Rxxxxab);
-        if sum(L)~=1
-            warning('HJW:ifversion:NotInDict',...
-                'The requested version is not in the hard-coded list.')
-            tf=NaN;return
-        else
-            v=v_dict{L,2};
-        end
-    elseif nargin==4
-        %undocumented shorthand syntax: skip the 'Octave' argument
-        [test,v]=deal(Oct_flag,Oct_test);
-        %convert 4.1 to 401
-        v=0.1*v+0.9*fix(v);v=round(100*v);
-    else
-        [test,v]=deal(Oct_test,Oct_ver);
-        %convert 4.1 to 401
-        v=0.1*v+0.9*fix(v);v=round(100*v);
-    end
-else
-    %convert R notation to numeric and convert 9.1 to 901
-    if isnumeric(Rxxxxab)
-        v=0.1*Rxxxxab+0.9*fix(Rxxxxab);v=round(100*v);
-    else
-        L=ismember(v_dict(:,1),Rxxxxab);
-        if sum(L)~=1
-            warning('HJW:ifversion:NotInDict',...
-                'The requested version is not in the hard-coded list.')
-            tf=NaN;return
-        else
-            v=v_dict{L,2};
-        end
-    end
-end
-switch test
-    case '=='
-        tf= v_num == v;
-    case '<'
-        tf= v_num <  v;
-    case '<='
-        tf= v_num <= v;
-    case '>'
-        tf= v_num >  v;
-    case '>='
-        tf= v_num >= v;
-end
-end
-function str=tmpname(StartFilenameWith,ext)
-%inject a string in the file name part returned by the tempname function
-if nargin<1,StartFilenameWith='';end
-if ~isempty(StartFilenameWith),StartFilenameWith=[StartFilenameWith '_'];end
-if nargin<2,ext='';else,if ~strcmp(ext(1),'.'),ext=['.' ext];end,end
-str=tempname;
-[p,f]=fileparts(str);
-str=fullfile(p,[StartFilenameWith f ext]);
 end

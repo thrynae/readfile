@@ -1,0 +1,308 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>readfile</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-09-05"><meta name="DC.source" content="readfile.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>readfile</h1><!--introduction--><p><tt style="font-size:0%">Formatted documentation for the readfile function.</tt>
+<div style="margin-top:-5em;color:grey">Read a UTF-8 or ANSI (US-ASCII) file.
+</div>
+<br>This function is aimed at providing a reliable method of reading a file. The backbone of this
+function is the fileread function. Further processing is done to attempt to detect if the file is
+UTF-8 or not, apply the transcoding and returning the file as an n-by-1 cell array for files with
+n lines.
+<br>
+<br>The test for being UTF-8 can fail. For files with chars in the 128:255 range, the test will
+often determine the encoding correctly, but it might fail. Online files are much more limited
+than offline files. To avoid this the files are downloaded to tempdir() and deleted after
+reading.
+<br>
+<br>In Octave there is poor to no support for chars above 255. This has to do with the way Octave
+runs: it stores chars in a single byte. This limits what Octave can do regardless of OS. There
+are plans to extent the support, but this appears to be very far down the priority list, since it
+requires a lot of explicit rewriting. Even the current support for 128-255 chars seems to be
+<https://wiki.octave.org/International_Characters_Support 'by accident'>. (Note that this
+paragraph was true in August 2020, so a big update to Octave (e.g. Octave 6) may have added
+support by now. Although, don't hold your breath.)
+</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Syntax</a></li><li><a href="#2">Output arguments</a></li><li><a href="#3">Input arguments</a></li><li><a href="#4">Compatibility, version info, and licence</a></li></ul></div><h2 id="1">Syntax</h2><pre class="language-matlab">data=readfile(filename)
+data=readfile(url)
+</pre><h2 id="2">Output arguments</h2><p>
+<table border=1>
+<tr><td>
+data
+</td><td>
+An n-by-1 cell array. it contains 1 cell per line in the file, even for empty lines.
+<br>See the compatibility matrix below for details about which combinations of OS, runtime and
+version are expected to return the correct output.
+</td></tr>
+</table>
+</p><h2 id="3">Input arguments</h2><p>
+<table border=1>
+<tr><td>
+filename
+</td><td>
+The relative or absolute path to a file.
+</td></tr>
+<tr><td>
+url
+</td><td>
+The url to a file.
+<br>An attempt will be made to download the file to the folder returned by tempdir(). After the
+reading is completed (or fails) the file is deleted.
+</td></tr>
+</table>
+</p><h2 id="4">Compatibility, version info, and licence</h2><p>
+<table>
+<tr>
+<td> Compatibility </td>
+<td style="border:2px solid black;"> Windows 10 </td>
+<td style="border:2px solid black;"> Ubuntu 20.04 LTS </td>
+<td style="border:2px solid black;"> MacOS 10.15 Catalina </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> ML R2020a </td>
+<td> works </td>
+<td> not tested </td>
+<td> not tested </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> ML R2018a </td>
+<td> works </td>
+<td> partial #3 </td>
+<td> not tested </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> ML R2015a </td>
+<td> works </td>
+<td> partial #3 </td>
+<td> not tested </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> ML R2011a </td>
+<td> works </td>
+<td> partial #3 </td>
+<td> not tested </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> ML 6.5 (R13) </td>
+<td> partial #2 </td>
+<td> not tested </td>
+<td> not tested </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> Octave 5.2.0 </td>
+<td> partial #1 </td>
+<td> partial #1 </td>
+<td> not tested </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> Octave 4.4.1 </td>
+<td> partial #1 </td>
+<td> not tested </td>
+<td> partial #1 </td>
+</tr>
+</table>
+</p><pre>note #1: no support for char&gt;255 (which are likely converted to 0)
+note #2: - no support for char&gt;255 ANSI (unpredictable output)
+         - online (without download): could fail for files that aren't ANSI&lt;256
+note #3: ANSI&gt;127 chars are converted to 65533</pre><pre>Version: 2.0.2
+Date:    2020-09-05
+Author:  H.J. Wisselink
+Licence: CC by-nc-sa 4.0 ( https://creativecommons.org/licenses/by-nc-sa/4.0 )
+Email = 'h_j_wisselink*alumnus_utwente_nl';
+Real_email = regexprep(Email,{'*','_'},{'@','.'})</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% readfile
+%
+% <html><tt style="font-size:0%">Formatted documentation for the readfile function.</tt>
+% <div style="margin-top:-5em;color:grey">Read a UTF-8 or ANSI (US-ASCII) file.
+% </div>
+% <br>This function is aimed at providing a reliable method of reading a file. The backbone of this
+% function is the fileread function. Further processing is done to attempt to detect if the file is
+% UTF-8 or not, apply the transcoding and returning the file as an n-by-1 cell array for files with
+% n lines.
+% <br>
+% <br>The test for being UTF-8 can fail. For files with chars in the 128:255 range, the test will
+% often determine the encoding correctly, but it might fail. Online files are much more limited
+% than offline files. To avoid this the files are downloaded to tempdir() and deleted after
+% reading.
+% <br>
+% <br>In Octave there is poor to no support for chars above 255. This has to do with the way Octave
+% runs: it stores chars in a single byte. This limits what Octave can do regardless of OS. There
+% are plans to extent the support, but this appears to be very far down the priority list, since it
+% requires a lot of explicit rewriting. Even the current support for 128-255 chars seems to be
+% <https://wiki.octave.org/International_Characters_Support 'by accident'>. (Note that this
+% paragraph was true in August 2020, so a big update to Octave (e.g. Octave 6) may have added
+% support by now. Although, don't hold your breath.)
+% </html>
+
+%% Syntax
+%
+%   data=readfile(filename)
+%   data=readfile(url)
+
+%% Output arguments
+%
+% <html>
+% <table border=1>
+% <tr><td>
+% data
+% </td><td>
+% An n-by-1 cell array. it contains 1 cell per line in the file, even for empty lines.
+% <br>See the compatibility matrix below for details about which combinations of OS, runtime and
+% version are expected to return the correct output.
+% </td></tr>
+% </table>
+% </html>
+
+%% Input arguments
+%
+% <html>
+% <table border=1>
+% <tr><td>
+% filename
+% </td><td>
+% The relative or absolute path to a file.
+% </td></tr>
+% <tr><td>
+% url
+% </td><td>
+% The url to a file.
+% <br>An attempt will be made to download the file to the folder returned by tempdir(). After the
+% reading is completed (or fails) the file is deleted.
+% </td></tr>
+% </table>
+% </html>
+
+%% Compatibility, version info, and licence
+%
+% <html>
+% <table>
+% <tr>
+% <td> Compatibility </td>
+% <td style="border:2px solid black;"> Windows 10 </td>
+% <td style="border:2px solid black;"> Ubuntu 20.04 LTS </td>
+% <td style="border:2px solid black;"> MacOS 10.15 Catalina </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> ML R2020a </td>
+% <td> works </td>
+% <td> not tested </td>
+% <td> not tested </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> ML R2018a </td>
+% <td> works </td>
+% <td> partial #3 </td>
+% <td> not tested </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> ML R2015a </td>
+% <td> works </td>
+% <td> partial #3 </td>
+% <td> not tested </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> ML R2011a </td>
+% <td> works </td>
+% <td> partial #3 </td>
+% <td> not tested </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> ML 6.5 (R13) </td>
+% <td> partial #2 </td>
+% <td> not tested </td>
+% <td> not tested </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> Octave 5.2.0 </td>
+% <td> partial #1 </td>
+% <td> partial #1 </td>
+% <td> not tested </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> Octave 4.4.1 </td>
+% <td> partial #1 </td>
+% <td> not tested </td>
+% <td> partial #1 </td>
+% </tr>
+% </table>
+% </html>
+%
+%  note #1: no support for char>255 (which are likely converted to 0)
+%  note #2: - no support for char>255 ANSI (unpredictable output)
+%           - online (without download): could fail for files that aren't ANSI<256
+%  note #3: ANSI>127 chars are converted to 65533
+%
+%  Version: 2.0.2
+%  Date:    2020-09-05
+%  Author:  H.J. Wisselink
+%  Licence: CC by-nc-sa 4.0 ( https://creativecommons.org/licenses/by-nc-sa/4.0 )
+%  Email = 'h_j_wisselink*alumnus_utwente_nl';
+%  Real_email = regexprep(Email,{'*','_'},{'@','.'})
+
+##### SOURCE END #####
+--></body></html>
