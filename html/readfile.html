@@ -6,8 +6,8 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>readfile</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-09-05"><meta name="DC.source" content="readfile.m"><style type="text/css">
-html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+      --><title>readfile</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-11-07"><meta name="DC.source" content="readfile.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
 html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
@@ -71,24 +71,40 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 <div style="margin-top:-5em;color:grey">Read a UTF-8 or ANSI (US-ASCII) file.
 </div>
 <br>This function is aimed at providing a reliable method of reading a file. The backbone of this
-function is the fileread function. Further processing is done to attempt to detect if the file is
-UTF-8 or not, apply the transcoding and returning the file as an n-by-1 cell array for files with
+function is fread, supplemented by the fileread function. These work in slightly different ways
+and can be used under different circumstances. An attempt is made to detect the encoding (UTF-8
+or ANSI), apply the transcoding and returning the file as an n-by-1 cell array for files with
 n lines.
+<br>You can redirect all outputs (errors only partially) to a file or a graphics object, so you
+can more easily use this function in a GUI or allow it to write to a log file.
 <br>
 <br>The test for being UTF-8 can fail. For files with chars in the 128:255 range, the test will
-often determine the encoding correctly, but it might fail. Online files are much more limited
-than offline files. To avoid this the files are downloaded to tempdir() and deleted after
-reading.
+often determine the encoding correctly, but it might fail, especially for files with encoding
+errors. Online files are much more limited than offline files. To avoid this the files are
+downloaded to tempdir() and deleted after reading. An additional fallback reads online files with
+webread/urlread, although this will often result in an incorrect output. This should only be
+relevant if there is no write access to the tempdir().
 <br>
-<br>In Octave there is poor to no support for chars above 255. This has to do with the way Octave
-runs: it stores chars in a single byte. This limits what Octave can do regardless of OS. There
-are plans to extent the support, but this appears to be very far down the priority list, since it
-requires a lot of explicit rewriting. Even the current support for 128-255 chars seems to be
-<https://wiki.octave.org/International_Characters_Support 'by accident'>. (Note that this
-paragraph was true in August 2020, so a big update to Octave (e.g. Octave 6) may have added
-support by now. Although, don't hold your breath.)
-</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Syntax</a></li><li><a href="#2">Output arguments</a></li><li><a href="#3">Input arguments</a></li><li><a href="#4">Compatibility, version info, and licence</a></li></ul></div><h2 id="1">Syntax</h2><pre class="language-matlab">data=readfile(filename)
+<br>The size of the char arrays may be different between Octave and Matlab. This is because
+Matlab encodes characters internally with UTF-16 (see <a
+href="https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html">this doc
+page</a>), which means all 'normal' characters only take up a single 16&nbsp;bit value. <a
+href="https://www.mathworks.com/help/matlab/matlab_env/how-the-matlab-process-uses-locale-settings.html">This
+doc page</a> seems to suggest Matlab uses UTF-8 to encode chars, but appears to only be true for
+file interactions. If you want to include higher Unicode code points (e.g. most emoji), some
+characters will require 2 elements in a char array. Octave use UTF-8 to encode chars, but chars
+with values 128-255 are supported <a
+href="https://wiki.octave.org/International_Characters_Support">'by accident'</a>. This might
+change at some point, but switching Octave to UTF-16 would require a lot of work, with the only
+fundamental benefit being that size functions will return the same results between Matlab and
+Octave. Judging by <a href="https://savannah.gnu.org/bugs/?49348">this discussion</a> in the
+Octave bug tracker, I doubt this change will ever happen.
+<br> It is therefore important to remember that a scalar char is not guaranteed to be a single
+Unicode character, and that a single Unicode character is not guaranteed to be a single glyph.
+</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Syntax</a></li><li><a href="#2">Output arguments</a></li><li><a href="#3">Input arguments</a></li><li><a href="#4">Name,Value pairs</a></li><li><a href="#5">Compatibility, version info, and licence</a></li></ul></div><h2 id="1">Syntax</h2><pre class="language-matlab">data=readfile(filename)
 data=readfile(url)
+data=readfile(___,options)
+data=readfile(___,Name,Value)
 </pre><h2 id="2">Output arguments</h2><p>
 <table border=1>
 <tr><td>
@@ -113,8 +129,61 @@ The url to a file.
 <br>An attempt will be made to download the file to the folder returned by tempdir(). After the
 reading is completed (or fails) the file is deleted.
 </td></tr>
+<tr><td>
+Name,Value
+</td><td>
+The settings below can be entered with a Name,Value syntax.
+</td></tr>
+<tr><td>
+options
+</td><td>
+Instead of the Name,Value, parameters can also be entered in a struct. Missing fields will be set
+to the default values.
+</td></tr>
 </table>
-</p><h2 id="4">Compatibility, version info, and licence</h2><p>
+</p><h2 id="4">Name,Value pairs</h2><p>
+<table border=1>
+<tr><td>
+print_to_con
+</td><td>
+A logical that controls whether warnings and other output will be printed to the command window.
+Errors can't be turned off.
+<br><code>default=true;</code> if either print_to_fid or print_to_obj is specified then <code>default=false;</code>
+</td></tr>
+<tr><td>
+print_to_fid
+</td><td>
+The file identifier where console output will be printed. Errors and warnings will be printed
+including the call stack. You can provide the fid for the command window (fid=1) to print
+warnings as text. Errors will be printed to the specified file before being actually thrown.
+<br>If both print_to_fid and print_to_obj are empty, this will have the effect of suppressing
+every output except errors.
+<br>This parameter does not affect warnings or errors during input parsing.
+<br><code>default=[];</code>
+</td></tr>
+<tr><td>
+print_to_obj
+</td><td>
+The handle to an object with a String property, e.g. an edit field in a GUI where console output
+will be printed. Messages with newline characters (ignoring trailing newlines) will be returned
+as a cell array. This includes warnings and errors, which will be printed without the call stack.
+Errors will be written to the object before the error is actually thrown.
+<br>If both print_to_fid and print_to_obj are empty, this will have the effect of suppressing
+every output except errors.
+<br>This parameter does not affect warnings or errors during input parsing.
+<br><code>default=[];</code>
+</td></tr>
+<tr><td>
+err_on_ANSI
+</td><td>
+If set to true, an error will be thrown when the input file is not recognized as UTF-8 encoded.
+This should normally not be an issue, as ANSI files can be read as well with this function.
+<br>If both print_to_fid and print_to_obj are empty, this will have the effect of suppressing
+every output except errors.
+<br><code>default=false;</code>
+</td></tr>
+</table>
+</p><h2 id="5">Compatibility, version info, and licence</h2><p>
 <table>
 <tr>
 <td> Compatibility </td>
@@ -123,7 +192,7 @@ reading is completed (or fails) the file is deleted.
 <td style="border:2px solid black;"> MacOS 10.15 Catalina </td>
 </tr>
 <tr>
-<td style="border:2px solid black;"> ML R2020a </td>
+<td style="border:2px solid black;"> ML R2020b </td>
 <td> works </td>
 <td> not tested </td>
 <td> not tested </td>
@@ -131,49 +200,46 @@ reading is completed (or fails) the file is deleted.
 <tr>
 <td style="border:2px solid black;"> ML R2018a </td>
 <td> works </td>
-<td> partial #3 </td>
+<td> works </td>
 <td> not tested </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> ML R2015a </td>
 <td> works </td>
-<td> partial #3 </td>
+<td> works </td>
 <td> not tested </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> ML R2011a </td>
 <td> works </td>
-<td> partial #3 </td>
+<td> works </td>
 <td> not tested </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> ML 6.5 (R13) </td>
-<td> partial #2 </td>
+<td> works </td>
 <td> not tested </td>
 <td> not tested </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> Octave 5.2.0 </td>
-<td> partial #1 </td>
-<td> partial #1 </td>
+<td> works </td>
+<td> works </td>
 <td> not tested </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> Octave 4.4.1 </td>
-<td> partial #1 </td>
+<td> works </td>
 <td> not tested </td>
-<td> partial #1 </td>
+<td> works </td>
 </tr>
 </table>
-</p><pre>note #1: no support for char&gt;255 (which are likely converted to 0)
-note #2: - no support for char&gt;255 ANSI (unpredictable output)
-         - online (without download): could fail for files that aren't ANSI&lt;256
-note #3: ANSI&gt;127 chars are converted to 65533</pre><pre>Version: 2.0.2
-Date:    2020-09-05
+</p><pre>Version: 3.0.0
+Date:    2020-11-07
 Author:  H.J. Wisselink
 Licence: CC by-nc-sa 4.0 ( https://creativecommons.org/licenses/by-nc-sa/4.0 )
 Email = 'h_j_wisselink*alumnus_utwente_nl';
-Real_email = regexprep(Email,{'*','_'},{'@','.'})</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+Real_email = regexprep(Email,{'*','_'},{'@','.'})</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% readfile
 %
@@ -181,28 +247,44 @@ Real_email = regexprep(Email,{'*','_'},{'@','.'})</pre><p class="footer"><br><a 
 % <div style="margin-top:-5em;color:grey">Read a UTF-8 or ANSI (US-ASCII) file.
 % </div>
 % <br>This function is aimed at providing a reliable method of reading a file. The backbone of this
-% function is the fileread function. Further processing is done to attempt to detect if the file is
-% UTF-8 or not, apply the transcoding and returning the file as an n-by-1 cell array for files with
+% function is fread, supplemented by the fileread function. These work in slightly different ways
+% and can be used under different circumstances. An attempt is made to detect the encoding (UTF-8
+% or ANSI), apply the transcoding and returning the file as an n-by-1 cell array for files with
 % n lines.
+% <br>You can redirect all outputs (errors only partially) to a file or a graphics object, so you
+% can more easily use this function in a GUI or allow it to write to a log file.
 % <br>
 % <br>The test for being UTF-8 can fail. For files with chars in the 128:255 range, the test will
-% often determine the encoding correctly, but it might fail. Online files are much more limited
-% than offline files. To avoid this the files are downloaded to tempdir() and deleted after
-% reading.
+% often determine the encoding correctly, but it might fail, especially for files with encoding
+% errors. Online files are much more limited than offline files. To avoid this the files are
+% downloaded to tempdir() and deleted after reading. An additional fallback reads online files with
+% webread/urlread, although this will often result in an incorrect output. This should only be
+% relevant if there is no write access to the tempdir().
 % <br>
-% <br>In Octave there is poor to no support for chars above 255. This has to do with the way Octave
-% runs: it stores chars in a single byte. This limits what Octave can do regardless of OS. There
-% are plans to extent the support, but this appears to be very far down the priority list, since it
-% requires a lot of explicit rewriting. Even the current support for 128-255 chars seems to be
-% <https://wiki.octave.org/International_Characters_Support 'by accident'>. (Note that this
-% paragraph was true in August 2020, so a big update to Octave (e.g. Octave 6) may have added
-% support by now. Although, don't hold your breath.)
+% <br>The size of the char arrays may be different between Octave and Matlab. This is because
+% Matlab encodes characters internally with UTF-16 (see <a
+% href="https://www.mathworks.com/help/matlab/matlab_prog/unicode-and-ascii-values.html">this doc
+% page</a>), which means all 'normal' characters only take up a single 16&nbsp;bit value. <a
+% href="https://www.mathworks.com/help/matlab/matlab_env/how-the-matlab-process-uses-locale-settings.html">This
+% doc page</a> seems to suggest Matlab uses UTF-8 to encode chars, but appears to only be true for
+% file interactions. If you want to include higher Unicode code points (e.g. most emoji), some
+% characters will require 2 elements in a char array. Octave use UTF-8 to encode chars, but chars
+% with values 128-255 are supported <a
+% href="https://wiki.octave.org/International_Characters_Support">'by accident'</a>. This might
+% change at some point, but switching Octave to UTF-16 would require a lot of work, with the only
+% fundamental benefit being that size functions will return the same results between Matlab and
+% Octave. Judging by <a href="https://savannah.gnu.org/bugs/?49348">this discussion</a> in the
+% Octave bug tracker, I doubt this change will ever happen.
+% <br> It is therefore important to remember that a scalar char is not guaranteed to be a single
+% Unicode character, and that a single Unicode character is not guaranteed to be a single glyph.
 % </html>
 
 %% Syntax
 %
 %   data=readfile(filename)
 %   data=readfile(url)
+%   data=readfile(___,options)
+%   data=readfile(___,Name,Value)
 
 %% Output arguments
 %
@@ -234,6 +316,63 @@ Real_email = regexprep(Email,{'*','_'},{'@','.'})</pre><p class="footer"><br><a 
 % <br>An attempt will be made to download the file to the folder returned by tempdir(). After the
 % reading is completed (or fails) the file is deleted.
 % </td></tr>
+% <tr><td>
+% Name,Value
+% </td><td>
+% The settings below can be entered with a Name,Value syntax.
+% </td></tr>
+% <tr><td>
+% options
+% </td><td>
+% Instead of the Name,Value, parameters can also be entered in a struct. Missing fields will be set
+% to the default values.
+% </td></tr>
+% </table>
+% </html>
+
+%% Name,Value pairs
+%
+% <html>
+% <table border=1>
+% <tr><td>
+% print_to_con
+% </td><td>
+% A logical that controls whether warnings and other output will be printed to the command window.
+% Errors can't be turned off.
+% <br><code>default=true;</code> if either print_to_fid or print_to_obj is specified then <code>default=false;</code>
+% </td></tr>
+% <tr><td>
+% print_to_fid
+% </td><td>
+% The file identifier where console output will be printed. Errors and warnings will be printed
+% including the call stack. You can provide the fid for the command window (fid=1) to print
+% warnings as text. Errors will be printed to the specified file before being actually thrown.
+% <br>If both print_to_fid and print_to_obj are empty, this will have the effect of suppressing
+% every output except errors.
+% <br>This parameter does not affect warnings or errors during input parsing.
+% <br><code>default=[];</code>
+% </td></tr>
+% <tr><td>
+% print_to_obj
+% </td><td>
+% The handle to an object with a String property, e.g. an edit field in a GUI where console output
+% will be printed. Messages with newline characters (ignoring trailing newlines) will be returned
+% as a cell array. This includes warnings and errors, which will be printed without the call stack.
+% Errors will be written to the object before the error is actually thrown.
+% <br>If both print_to_fid and print_to_obj are empty, this will have the effect of suppressing
+% every output except errors.
+% <br>This parameter does not affect warnings or errors during input parsing.
+% <br><code>default=[];</code>
+% </td></tr>
+% <tr><td>
+% err_on_ANSI
+% </td><td>
+% If set to true, an error will be thrown when the input file is not recognized as UTF-8 encoded.
+% This should normally not be an issue, as ANSI files can be read as well with this function.
+% <br>If both print_to_fid and print_to_obj are empty, this will have the effect of suppressing
+% every output except errors.
+% <br><code>default=false;</code>
+% </td></tr>
 % </table>
 % </html>
 
@@ -248,7 +387,7 @@ Real_email = regexprep(Email,{'*','_'},{'@','.'})</pre><p class="footer"><br><a 
 % <td style="border:2px solid black;"> MacOS 10.15 Catalina </td>
 % </tr>
 % <tr>
-% <td style="border:2px solid black;"> ML R2020a </td>
+% <td style="border:2px solid black;"> ML R2020b </td>
 % <td> works </td>
 % <td> not tested </td>
 % <td> not tested </td>
@@ -256,49 +395,44 @@ Real_email = regexprep(Email,{'*','_'},{'@','.'})</pre><p class="footer"><br><a 
 % <tr>
 % <td style="border:2px solid black;"> ML R2018a </td>
 % <td> works </td>
-% <td> partial #3 </td>
+% <td> works </td>
 % <td> not tested </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> ML R2015a </td>
 % <td> works </td>
-% <td> partial #3 </td>
+% <td> works </td>
 % <td> not tested </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> ML R2011a </td>
 % <td> works </td>
-% <td> partial #3 </td>
+% <td> works </td>
 % <td> not tested </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> ML 6.5 (R13) </td>
-% <td> partial #2 </td>
+% <td> works </td>
 % <td> not tested </td>
 % <td> not tested </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> Octave 5.2.0 </td>
-% <td> partial #1 </td>
-% <td> partial #1 </td>
+% <td> works </td>
+% <td> works </td>
 % <td> not tested </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> Octave 4.4.1 </td>
-% <td> partial #1 </td>
+% <td> works </td>
 % <td> not tested </td>
-% <td> partial #1 </td>
+% <td> works </td>
 % </tr>
 % </table>
 % </html>
 %
-%  note #1: no support for char>255 (which are likely converted to 0)
-%  note #2: - no support for char>255 ANSI (unpredictable output)
-%           - online (without download): could fail for files that aren't ANSI<256
-%  note #3: ANSI>127 chars are converted to 65533
-%
-%  Version: 2.0.2
-%  Date:    2020-09-05
+%  Version: 3.0.0
+%  Date:    2020-11-07
 %  Author:  H.J. Wisselink
 %  Licence: CC by-nc-sa 4.0 ( https://creativecommons.org/licenses/by-nc-sa/4.0 )
 %  Email = 'h_j_wisselink*alumnus_utwente_nl';
