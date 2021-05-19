@@ -6,4 +6,6 @@ This function takes care of that problem by providing a single way of reading a 
 
 It is also possible to enter the file name as a URL. In that case this function will download the file to the temporary directory, read it, and delete it. If that fails, webread/urlread will be used to read the file as a char array, although that may limit which characters can be read depending on the Matlab/Octave release and OS.
 
+This function support most syntax options that the readlines function (introduced in R2020b) supports. It even has a switch to reproduce a bug with reading most emoji. In general cellstr(readlines(___)) should provide equivalent results.
+
 Licence: CC by-nc-sa 4.0
