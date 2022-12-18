@@ -1,0 +1,53 @@
+{
+    "_schemaVersion": "1.0.0",
+    "_v_readfile":"4.1.0",
+    "readfile":
+    {
+        "inputs":
+        [
+            {"name":"filename", "kind":"required", "type":["char","row"],
+             "purpose":"File name (relative or absolute path) or URL"},
+            {"mutuallyExclusiveGroup":
+             [
+                 [
+                     {"name":"OptionStruct", "kind":"positional", "type":["struct"],
+                      "purpose":"Struct containing the options"}
+                 ],
+                 [
+                     {"name":"err_on_ANSI",          "kind":"namevalue", "type":["logical","scalar","choices={true,false}"],
+                      "purpose":"Throw error for non-UTF-8 file"},
+                     {"name":"EmptyLineRule",        "kind":"namevalue", "type":[["char","row","choices={'read','skip','error','skipleading','skiptrailing'}"],["string","scalar","choices={\"read\",\"skip\",\"error\",\"skipleading\",\"skiptrailing\"}"]],
+                      "purpose":"How to handle empty lines"},
+                     {"name":"LineEnding",           "kind":"namevalue", "type":[["char","row"],["string"],["cell"]],
+                      "purpose":"Line ending chars, cellstr parsed by sprintf"},
+                     {"name":"Whitespace",           "kind":"namevalue", "type":[["char","row"],["string","scalar"],["cell"]],
+                      "purpose":"Characters considered whitespace"},
+                     {"name":"UseReadlinesDefaults", "kind":"namevalue", "type":["logical","scalar","choices={true,false}"],
+                      "purpose":"Reproduce cellstr(readlines(___))"},
+                     {"name":"print_to_con","kind":"namevalue",
+                      "type":["logical","scalar"],
+                      "purpose":"Exception redirection command window flag"},
+                     {"name":"print_to_fid","kind":"namevalue",
+                      "type":"double",
+                      "purpose":"Exception redirection file identifier"},
+                     {"name":"print_to_obj","kind":"namevalue",
+                      "purpose":"Exception redirection object handle"},
+                     {"name":"print_to_fcn","kind":"namevalue",
+                      "type":[["function_handle"],["inline"]],
+                      "purpose":"Exception redirection function handle"},
+                     {"name":"print_to_params","kind":"namevalue",
+                      "type":["struct","scalar"],
+                      "purpose":"Exception redirection optional parameters"},
+                     {"name":"print_to_option_ShowTraceInMessage","kind":"namevalue",
+                      "type":["logical","scalar"],
+                      "purpose":"Include function trace in message"},
+                     {"name":"print_to_option_WipeTraceForBuiltin","kind":"namevalue",
+                      "type":["logical","scalar"],
+                      "purpose":"Remove function trace from message"}
+                 ]
+             ]
+            }
+        ]
+    }
+}
+
