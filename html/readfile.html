@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>readfile</title><meta name="generator" content="MATLAB 9.10"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-05-19"><meta name="DC.source" content="readfile.m"><style type="text/css">
+      --><title>readfile</title><meta name="generator" content="MATLAB 9.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-12-18"><meta name="DC.source" content="readfile.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -89,10 +89,10 @@ errors. Online files are much more limited than offline files. To avoid this the
 downloaded to tempdir() and deleted after reading. An additional fallback reads online files with
 webread/urlread, although this will often result in an incorrect output. This should only be
 relevant if there is no write access to the tempdir().
-</p><h2 id="2">Syntax</h2><pre class="language-matlab">data=readfile(filename)
-data=readfile(url)
-data=readfile(___,options)
-data=readfile(___,Name,Value)
+</p><h2 id="2">Syntax</h2><pre class="language-matlab">data = readfile(filename)
+data = readfile(url)
+data = readfile(___,options)
+data = readfile(___,Name,Value)
 </pre><h2 id="3">Output arguments</h2><p>
 <table border=1>
 <tr><td>
@@ -132,52 +132,6 @@ to the default values.
 </table>
 </p><h2 id="5">Name,Value pairs</h2><p>
 <table border=1>
-<tr><td>
-print_to_con
-</td><td>
-A logical that controls whether warnings and other output will be printed to the command window.
-Errors can't be turned off.
-<br><code>default=true;</code> if print_to_fid, print_to_obj, or print_to_fcn is specified then
-<code>default=false;</code>
-</td></tr>
-<tr><td>
-print_to_fid
-</td><td>
-The file identifier where console output will be printed. Errors and warnings will be printed
-including the call stack. You can provide the fid for the command window (fid=1) to print
-warnings as text. Errors will be printed to the specified file before being actually thrown.
-<br>If print_to_fid, print_to_obj, and print_to_fcn are all empty, this will have the effect of
-suppressing every output except errors.
-<br>This parameter does not affect warnings or errors during input parsing.
-<br>Array inputs are allowed.
-<br><code>default=[];</code>
-</td></tr>
-<tr><td>
-print_to_obj
-</td><td>
-The handle to an object with a String property, e.g. an edit field in a GUI where console output
-will be printed. Messages with newline characters (ignoring trailing newlines) will be returned
-as a cell array. This includes warnings and errors, which will be printed without the call stack.
-Errors will be written to the object before the error is actually thrown.
-<br>If print_to_fid, print_to_obj, and print_to_fcn are all empty, this will have the effect of
-suppressing every output except errors.
-<br>This parameter does not affect warnings or errors during input parsing.
-<br>Array inputs are allowed.
-<br><code>default=[];</code>
-<tr><td>
-print_to_fcn
-</td><td>
-A <code>struct</code> with a function handle, anonymous function or inline function in the
-<code>'h'</code> field and optionally additional data in the <code>'data'</code> field. The
-function should accept three inputs: a <code>char</code> array (either <code>'warning'</code> or
-<code>'error'</code>), a <code>struct</code> with the message, id, and stack, and the optional
-additional data. The function(s) will be run before the error is actually thrown.
-<br>If print_to_fid, print_to_obj, and print_to_fcn are all empty, this will have the effect of
-suppressing every output except errors.
-<br>This parameter does not affect warnings or errors during input parsing.
-<br>Array inputs are allowed.
-<br><code>default=[];</code>
-</td></tr>
 <tr><td>
 err_on_ANSI
 </td><td>
@@ -229,6 +183,14 @@ char vectors are parsed by sprintf and concatenated. Note that the default for r
 <br><code>default=[8 9 28:32 160 5760 8192:8202 8239 8287 12288];</code>
 </td></tr>
 <tr><td>
+Whitespace
+</td><td>
+For online files, this parameter allows using <code>weboptions</code>. For releases without
+<code>weboptions</code> and for offline files, this parameter is ignored. Note that the content
+type option will be overwritten.
+<br><code>default=weboptions;</code>
+</td></tr>
+<tr><td>
 UseReadlinesDefaults
 </td><td>
 Reproduce the default behavior of readlines as closely as possible. This includes reproducing a
@@ -237,6 +199,56 @@ UTF-16 (everything outside the base multilingual plane, i.e. most emoji) to be c
 <code>char(26)</code>.
 <br>This will not convert the output to a string array.
 <br><code>default=false;</code>
+</td></tr>
+<tr><td>
+print_to_con
+</td><td>
+<i>An attempt is made to also use this parameter for warnings or errors during input parsing.</i>
+<br>A logical that controls whether warnings and other output will be printed to the command
+window. Errors can't be turned off.
+<br><code>default=true;</code>
+<br>Specifying <code>print_to_fid</code>, <code>print_to_obj</code>, or <code>print_to_fcn</code>
+will change the default to <code>false</code>, unless parsing of any of the other exception
+redirection options results in an error.
+</td></tr>
+<tr><td>
+print_to_fid
+</td><td>
+<i>An attempt is made to also use this parameter for warnings or errors during input parsing.</i>
+<br>The file identifier where console output will be printed. Errors and warnings will be printed
+including the call stack. You can provide the fid for the command window (<code>fid=1</code>) to
+print warnings as text. Errors will be printed to the specified file before the error is actually
+thrown.
+<br>If <code>print_to_fid</code>, <code>print_to_obj</code>, and <code>print_to_fcn</code> are
+all empty, this will have the effect of suppressing every output except errors.
+<br>Array inputs are allowed.
+<br><code>default=[];</code>
+</td></tr>
+<tr><td>
+print_to_obj
+</td><td>
+<i>An attempt is made to also use this parameter for warnings or errors during input parsing.</i>
+<br>The handle to an object with a String property, e.g. an edit field in a GUI where console
+output will be printed. Messages with newline characters (ignoring trailing newlines) will be
+returned as a cell array. This includes warnings and errors, which will be printed without the
+call stack. Errors will be written to the object before the error is actually thrown.
+<br>If <code>print_to_fid</code>, <code>print_to_obj</code>, and <code>print_to_fcn</code> are
+all empty, this will have the effect of suppressing every output except errors.
+<br>Array inputs are allowed.
+<br><code>default=[];</code>
+<tr><td>
+print_to_fcn
+</td><td>
+<i>An attempt is made to also use this parameter for warnings or errors during input parsing.</i>
+<br>A <code>struct</code> with a function handle, anonymous function or inline function in the
+<code>'h'</code> field and optionally additional data in the <code>'data'</code> field. The
+function should accept three inputs: a <code>char</code> array (either <code>'warning'</code> or
+<code>'error'</code>), a <code>struct</code> with the message, id, and stack, and the optional
+additional data. The function(s) will be run before the error is actually thrown.
+<br>If <code>print_to_fid</code>, <code>print_to_obj</code>, and <code>print_to_fcn</code> are
+all empty, this will have the effect of suppressing every output except errors.
+<br>Array inputs are allowed.
+<br><code>default=[];</code>
 </td></tr>
 </table>
 </p><h2 id="6">Compatibility, version info, and licence</h2><p>
@@ -269,7 +281,7 @@ Compatibility considerations:
       <code>true</code> for all files.
       <br>Since R2021a <code>readlines</code> also supports reading online files.</li>
    <li> Incorrect reading of files should only occur if the download to a temporary location
-      fails. (<b>NB: this should be a rare occurence</b>) Modern releases of Matlab (>=R2015a)
+      fails. (<b>NB: this should be a rare occurence</b>) Modern releases of Matlab (&ge;R2015a)
       are expected to read every file correctly, except for ANSI files containing special
       characters. GNU Octave has trouble with many ANSI files. Older releases of Matlab have the
       same results as Octave for ANSI files, but also have issues with some UTF-8 files.
@@ -279,9 +291,27 @@ Compatibility considerations:
 <table>
 <tr>
 <td> Test suite result </td>
-<td style="border:2px solid black;"> Windows XP/7/10 </td>
-<td style="border:2px solid black;"> Ubuntu 20.04 LTS </td>
-<td style="border:2px solid black;"> MacOS 10.15 Catalina </td>
+<td style="border:2px solid black;"> Windows </td>
+<td style="border:2px solid black;"> Linux </td>
+<td style="border:2px solid black;"> MacOS </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> Matlab R2022b </td>
+<td> <it>W10 : Pass</it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
+<td> <it>Monterey : Pass</it> </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> Matlab R2022a </td>
+<td> <it>W10 : Pass</it> </td>
+<td> <it></it> </td>
+<td> <it></it> </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> Matlab R2021b </td>
+<td> <it>W10 : Pass</it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
+<td> <it>Monterey : Pass</it> </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> Matlab R2021a </td>
@@ -292,8 +322,8 @@ Compatibility considerations:
 <tr>
 <td style="border:2px solid black;"> Matlab R2020b </td>
 <td> <it>W10 : Pass</it> </td>
-<td> <it></it> </td>
-<td> <it></it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
+<td> <it>Monterey : Pass</it> </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> Matlab R2020a </td>
@@ -302,15 +332,39 @@ Compatibility considerations:
 <td> <it></it> </td>
 </tr>
 <tr>
+<td style="border:2px solid black;"> Matlab R2019b </td>
+<td> <it>W10 : Pass</it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
+<td> <it>Monterey : Pass</it> </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> Matlab R2019a </td>
+<td> <it>W10 : Pass</it> </td>
+<td> <it></it> </td>
+<td> <it></it> </td>
+</tr>
+<tr>
 <td style="border:2px solid black;"> Matlab R2018a </td>
 <td> <it>W10 : Pass</it> </td>
-<td> <it>Pass</it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
 <td> <it></it> </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> Matlab R2017b </td>
+<td> <it>W10 : Pass</it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
+<td> <it>Monterey : Pass</it> </td>
+</tr>
+<tr>
+<td style="border:2px solid black;"> Matlab R2016b </td>
+<td> <it>W10 : Pass</it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
+<td> <it>Monterey : Pass</it> </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> Matlab R2015a </td>
 <td> <it>W10 : Pass</it> </td>
-<td> <it>Pass</it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
 <td> <it></it> </td>
 </tr>
 <tr>
@@ -320,21 +374,21 @@ Compatibility considerations:
 <td> <it></it> </td>
 </tr>
 <tr>
-<td style="border:2px solid black;"> Matlab R2012b </td>
-<td> <it>W10 : Pass</it> </td>
+<td style="border:2px solid black;"> Matlab R2012a </td>
 <td> <it></it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
 <td> <it></it> </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> Matlab R2011a </td>
 <td> <it>W10 : Pass</it> </td>
-<td> <it>Pass</it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
 <td> <it></it> </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> Matlab R2010b </td>
 <td> <it></it> </td>
-<td> <it>Pass</it> </td>
+<td> <it>ubuntu_22.04 : Pass</it> </td>
 <td> <it></it> </td>
 </tr>
 <tr>
@@ -362,454 +416,36 @@ Compatibility considerations:
 <td> <it></it> </td>
 </tr>
 <tr>
-<td style="border:2px solid black;"> Octave 6.2.0 </td>
+<td style="border:2px solid black;"> Octave 7.2.0 </td>
 <td> <it>W10 : Pass</it> </td>
 <td> <it></it> </td>
 <td> <it></it> </td>
 </tr>
 <tr>
+<td style="border:2px solid black;"> Octave 6.2.0 </td>
+<td> <it>W10 : Pass</it> </td>
+<td> <it>raspbian_11 : Pass</it> </td>
+<td> <it>Catalina : Pass</it> </td>
+</tr>
+<tr>
 <td style="border:2px solid black;"> Octave 5.2.0 </td>
 <td> <it>W10 : Pass</it> </td>
-<td> <it>Pass</it> </td>
+<td> <it></it> </td>
 <td> <it></it> </td>
 </tr>
 <tr>
 <td style="border:2px solid black;"> Octave 4.4.1 </td>
 <td> <it>W10 : Pass</it> </td>
 <td> <it></it> </td>
-<td> <it>Pass</it> </td>
+<td> <it>Catalina : Pass</it> </td>
 </tr>
 </table>
-</p><pre>Version: 3.0.0
-Date:    2020-11-07
+</p><pre>Version: 4.1.0
+Date:    2022-12-18
 Author:  H.J. Wisselink
 Licence: CC by-nc-sa 4.0 ( https://creativecommons.org/licenses/by-nc-sa/4.0 )
 Email = 'h_j_wisselink*alumnus_utwente_nl';
-Real_email = regexprep(Email,{'*','_'},{'@','.'})</pre><h2 id="7">Test suite</h2><p>This tester is included so you can test if your own modifications would introduce any bugs. These tests form the basis for the compatibility table above.</p><p>Note that some of the functions in this tester might be different from the functions included in the actual function. Usually this is done to allow triggering of certain errors.</p><p>To save space, the tester function below was minified. The full tester function (including all comments) can be found <a href="https://web.archive.org/web/20210519082944/https://cdn-106.anonfiles.com/p3Y1Ubw7u4/3edfdff8-1621413582/aaa___readfile___test.m">here</a>.</p><pre class="codeinput"><span class="comment">% Test the readfile function</span>
-<span class="comment">% The files were written with Notepad++ (which is how encoding was done)</span>
-<span class="comment">% The chars were copied from the command window with (except the UTF8-4 file):</span>
-<span class="comment">%    clc,fprintf('%c\n',list_of_chars)</span>
-<span class="comment">%</span>
-<span class="comment">% one file set contains a wide variety of chars, the other only 32:255</span>
-<span class="comment">% one file set is UTF-8, the other is ANSI</span>
-<span class="comment">% one last file was written in UTF-8 containing all chars supported by the text2im function</span>
-<span class="comment">%</span>
-<span class="comment">% the web reader is tested here as well</span>
-<span class="comment">%</span>
-<span class="comment">% the test files are available online:</span>
-<span class="comment">% http://web.archive.org/web/20200602120202/</span>
-<span class="comment">%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_ANSI_1.txt</span>
-<span class="comment">% http://web.archive.org/web/20200602120203/</span>
-<span class="comment">%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_ANSI_2.txt</span>
-<span class="comment">% http://web.archive.org/web/20200602120204/</span>
-<span class="comment">%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_UTF-8_1.txt</span>
-<span class="comment">% http://web.archive.org/web/20200602120206/</span>
-<span class="comment">%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_UTF-8_2.txt</span>
-<span class="comment">% http://web.archive.org/web/20200602120207/</span>
-<span class="comment">%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_UTF-8_3.txt</span>
-<span class="comment">% http://web.archive.org/web/20201106120218/</span>
-<span class="comment">%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_UTF-8_4.txt</span>
-<span class="comment">%</span>
-<span class="comment">% Pass:    passes all tests</span>
-<span class="comment">% Partial: not 100% correct result for downloaded files or not equivalent to readlines</span>
-<span class="comment">% Fail:    fails any test or any percentage of correct characters not matching expectation</span>
-<span class="comment">%</span>
-<span class="keyword">function</span> v000=aaa___readfile___test(varargin),v000=<span class="string">'pass'</span>;<span class="keyword">if</span> nargin==0,v001=false;<span class="keyword">else</span>,v001=<span class="keyword">...</span>
-true;<span class="keyword">end</span>,v002=test_syntax;<span class="keyword">if</span> strcmp(v002,<span class="string">'fail'</span>),<span class="keyword">if</span> nargout&gt;0,v000=<span class="string">'fail'</span>;<span class="keyword">return</span>,<span class="keyword">else</span>,<span class="keyword">...</span>
-error(<span class="string">'syntax test failed'</span>),<span class="keyword">end</span>,<span class="keyword">end</span>,v003=exist(<span class="string">'OCTAVE_VERSION'</span>, <span class="string">'builtin'</span>) ~= 0;v004{1}=[ <span class="keyword">...</span>
-0032:0035 0037 0039:0042 0044:0059 0061 0063 0065:0091 0093 0096:0122 0160 0171 0173 0183 <span class="keyword">...</span>
-0187:0189 0191:0193 0196 0200:0203 0205 0207 0209 0211 0212 0218 0224:0226 0228 0230:0235 <span class="keyword">...</span>
-0237:0239 0241:0244 0246 0249:0253 8211 8212 8216:8218 8220:8222 8226 8230];v004{2}=[32:126 <span class="keyword">...</span>
-160:255 32 32 32];v004{3}=[ 0032:0126 0161:0163 0165 0167:0172 0174:0187 0191:0214 0216:0275 <span class="keyword">...</span>
-0278:0289 0292 0293 0295 0298 0299 0304 0305 0308 0309 0313 0314 0317 0318 0321:0324 0327 0328 <span class="keyword">...</span>
-0336:0341 0344:0357 0362:0369 0376:0382 0913:0929 0931:0974 0977 0984:0989 0991:0993 8211 8212 <span class="keyword">...</span>
-8216:8222 8224 8225 8226 8230 8240 8249 8250 8260 8353 8356 8358 8361 8363 8364 8370 8482];
-v004{4}=[ 008986,009785,010084,128025,128512,128512,128513,128522,128550,128551,128552,128553,<span class="keyword">...</span>
-128555,128561,128578,128583,129343];<span class="keyword">for</span> v005=1:4,v006=num2cell(v004{v005}).';<span class="keyword">for</span> v007=<span class="keyword">...</span>
-1:numel(v006),v006{v007}=unicode_to_char(v006{v007});<span class="keyword">end</span>,v004{v005}=v006;<span class="keyword">end</span>,v008={<span class="string">'ANSI'</span>,<span class="keyword">...</span>
-<span class="string">'UTF-8'</span>};v009={<span class="string">'wide range of chars'</span>,<span class="string">'32:255 printable chars'</span>,<span class="string">'nearly all chars'</span>,<span class="keyword">...</span>
-<span class="string">'emoji (mostly two-word UTF-16)'</span>};v010=<span class="string">'http://web.archive.org/web/'</span>;v011=<span class="keyword">...</span>
-<span class="string">'id_/https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file'</span>;v012={ <span class="keyword">...</span>
-<span class="string">'20200602120202'</span>,<span class="string">'20200602120203'</span>,NaN,NaN;<span class="string">'20200602120204'</span>,<span class="string">'20200602120206'</span>,<span class="string">'20200602120207'</span>,<span class="keyword">...</span>
-<span class="string">'20201106120218'</span>};v013=[ 100 100 0 0 ;100 100 100 100];<span class="keyword">if</span> ~v003,<span class="keyword">if</span> ~ifversion(<span class="string">'=='</span>,<span class="string">'R14SP3'</span>) &amp;&amp; <span class="keyword">...</span>
-ifversion(<span class="string">'&lt;'</span>,<span class="string">'R2006a'</span>),v014=cat(3,v013,v013,[92 100 0 0 ;60 50 26 0 ]);<span class="keyword">elseif</span> ~ifversion(<span class="string">'=='</span>,<span class="keyword">...</span>
-<span class="string">'R14SP3'</span>) &amp;&amp; ifversion(<span class="string">'&lt;'</span>,8.4),v014=cat(3,v013,v013,[60 50 0 0 ;92 100 93 100]);<span class="keyword">elseif</span> <span class="keyword">...</span>
-ifversion(<span class="string">'=='</span>,<span class="string">'R14SP3'</span>),v014=cat(3,v013,v013,[92 100 0 0 ;100 100 100 100]);<span class="keyword">else</span>,v014=cat(3,<span class="keyword">...</span>
-v013,v013,[92 100 0 0 ;100 100 100 100]);<span class="keyword">end</span>,<span class="keyword">else</span>,v014=cat(3,v013,v013,[60 50 0 0 ;100 100 100 <span class="keyword">...</span>
-100]);<span class="keyword">end</span>,<span class="keyword">global</span> HJW___test_suit___debug_hook_data,HJW___test_suit___debug_hook_data=[];v015=<span class="keyword">...</span>
-zeros(size(v014));clc,<span class="keyword">for</span> v016=0:2,<span class="keyword">for</span> v005=1:4,<span class="keyword">for</span> v017=1:2,<span class="keyword">if</span> v005==3 &amp;&amp; v017==1,<span class="keyword">continue</span>,<span class="keyword">end</span>,<span class="keyword">...</span>
-<span class="keyword">if</span> v005==4 &amp;&amp; v017==1,<span class="keyword">continue</span>,<span class="keyword">end</span>,<span class="keyword">try</span> <span class="keyword">if</span> v016==1,v018=sprintf(<span class="string">'%s%s%s_%s_%d.txt'</span>,v010,<span class="keyword">...</span>
-v012{v017,v005},v011,v008{v017},v005);v019=<span class="string">' [online file]'</span>;<span class="keyword">elseif</span> v016==2,v018=<span class="keyword">...</span>
-sprintf(<span class="string">'%s%s%s_%s_%d.txt'</span>,v010,v012{v017,v005},v011,v008{v017},v005);v019=<span class="keyword">...</span>
-<span class="string">' [online file, no temp download]'</span>;HJW___test_suit___debug_hook_data=struct(<span class="string">'action'</span>,<span class="string">'error'</span>,<span class="keyword">...</span>
-<span class="string">'data'</span>,{<span class="string">' '</span>});<span class="keyword">else</span>,v018=sprintf(<span class="string">'aaa___test_file_%s_%d.txt'</span>,v008{v017},v005);v019=<span class="string">''</span>;<span class="keyword">if</span> <span class="keyword">...</span>
-~exist(v018,<span class="string">'file'</span>),v020=v014(v017,v005,v016+1);
-fprintf(<span class="string">'[file missing, assuming %02d%% correct: %s (%s)\n'</span>,v020,v008{v017},v009{v005});
-v015(v017,v005,v016+1)=v020;<span class="keyword">continue</span>;<span class="keyword">end</span>;<span class="keyword">end</span>;v021=readfile(v018);<span class="keyword">if</span> isequal(v021,v004{v005});
-fprintf(<span class="string">'Read 100%% correct: %s (%s)%s\n'</span>,v008{v017},v009{v005},v019);v015(v017,v005,v016+1)=<span class="keyword">...</span>
-100;<span class="keyword">else</span>;<span class="keyword">if</span> v016==1;v000=<span class="string">'partial: downloaded file failed'</span>;<span class="keyword">end</span>;v022=false(size(v021));<span class="keyword">for</span> v023=<span class="keyword">...</span>
-1:numel(v021);v022(v023)=isequal(v021{v023},v004{v005}{v023});<span class="keyword">end</span>;v024=floor(100*mean(v022));
-fprintf(<span class="string">'Read  %02d%% correct: %s (%s)%s\n'</span>,v024,v008{v017},v009{v005},v019);v015(v017,v005,<span class="keyword">...</span>
-v016+1)=v024;<span class="keyword">end</span>;<span class="keyword">catch</span>;fprintf(<span class="string">'[error] Read failed: %s (%s)%s\n'</span>,v008{v017},v009{v005},v019);
-<span class="keyword">if</span> v016==1 &amp;&amp; ~isnetavl;fprintf(<span class="string">'        note: no internet connection available\n'</span>);<span class="keyword">end</span>;
-v015(v017,v005,v016+1)=-1;v025=lasterror;fprintf(<span class="string">'  [%s]\n'</span>,v025.message);<span class="keyword">end</span>;<span class="keyword">end</span>;<span class="keyword">end</span>;<span class="keyword">end</span>;<span class="keyword">if</span> <span class="keyword">...</span>
-isequal(v015,v014);v026=false;fprintf(<span class="string">'\nTest result matches expectation.\n\n'</span>);<span class="keyword">else</span>;v026=true;
-fprintf(<span class="string">'\nTest result did *not* match expected result.\n\n'</span>);<span class="keyword">end</span>;<span class="keyword">try</span> v027=<span class="keyword">...</span>
-~isempty(which(func2str(@readlines)));<span class="keyword">catch</span>,v027=false;<span class="keyword">end</span>;<span class="keyword">if</span> v027 &amp;&amp; isnetavl;v028=<span class="keyword">...</span>
-readfile(v018,<span class="string">'FailMultiword_UTF16'</span>,true);<span class="keyword">try</span> v029=cellstr(readlines(v018));<span class="keyword">catch</span>,v029=v028;<span class="keyword">end</span>;
-v023=readfile(v018,<span class="string">'UseReadlinesDefaults'</span>,true);<span class="keyword">if</span> isequal(v028,v029);
-fprintf(<span class="string">'The bug in readlines() has not been fixed yet.\n'</span>);<span class="keyword">elseif</span> ~isequal(v029,v023);
-fprintf(<span class="string">'The replication of readfile() failed.\n'</span>);<span class="keyword">if</span> nargout&gt;0;v000=<span class="keyword">...</span>
-<span class="string">'partial: readfile replication failed'</span>;<span class="keyword">end</span>;<span class="keyword">end</span>;<span class="keyword">end</span>;<span class="keyword">if</span> v026;<span class="keyword">if</span> nargout&gt;0;v000=<span class="string">'fail'</span>;<span class="keyword">return</span>;<span class="keyword">else</span>;
-error(<span class="string">'test did not match expected result'</span>);<span class="keyword">end</span>;<span class="keyword">elseif</span> ~v001;disp(<span class="string">'test completed'</span>);<span class="keyword">end</span>;<span class="keyword">if</span> <span class="keyword">...</span>
-nargout==0,clear,<span class="keyword">end</span>;<span class="keyword">end</span>
-<span class="keyword">function</span> v000=unicode_to_UTF16(v001),<span class="keyword">if</span> v001&lt;65536,v000=v001;<span class="keyword">return</span>,<span class="keyword">end</span>,v002=double(v001)-65536;
-v002=dec2bin(v002,20);v000=bin2dec([<span class="string">'110110'</span> v002(1:10);<span class="string">'110111'</span> v002(11:20)]).';<span class="keyword">end</span>
-<span class="keyword">function</span> varargout=debug_hook(varargin),<span class="keyword">global</span> HJW___test_suit___debug_hook_data,<span class="keyword">if</span> <span class="keyword">...</span>
-isempty(HJW___test_suit___debug_hook_data),varargout=varargin;<span class="keyword">return</span>,<span class="keyword">end</span>,v000=<span class="keyword">...</span>
-HJW___test_suit___debug_hook_data(1);HJW___test_suit___debug_hook_data(1)=[];<span class="keyword">switch</span> v000.action,<span class="keyword">...</span>
-<span class="keyword">case</span> <span class="string">'return'</span>,varargout=v000.data;<span class="keyword">case</span> <span class="string">'warning'</span>,varargout=varargin;warning(v000.data{:}),<span class="keyword">case</span> <span class="keyword">...</span>
-<span class="string">'error'</span>,error(v000.data{:}),<span class="keyword">case</span> <span class="string">'warning_'</span>,varargout=varargin;warning_(v000.data{:}),<span class="keyword">case</span> <span class="keyword">...</span>
-<span class="string">'error_'</span>,error_(v000.data{:}),<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> error_(v001,varargin),<span class="keyword">persistent</span> v000,<span class="keyword">if</span> isempty(v000),v000=func2str(@error_);<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-isempty(v001),v001=struct;<span class="keyword">end</span>,v001=parse_warning_error_redirect_options(v001);[v002,v003,v004,<span class="keyword">...</span>
-v005]=parse_warning_error_redirect_inputs(varargin{:});v006=struct(<span class="string">'identifier'</span>,v002,<span class="string">'message'</span>,<span class="keyword">...</span>
-v003,<span class="string">'stack'</span>,v004);<span class="keyword">if</span> v001.boolean.obj,v007=v003;<span class="keyword">while</span> v007(end)==10,v007(end)=<span class="string">''</span>;<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-any(v007==10),v007=char2cellstr([<span class="string">'Error: '</span> v007]);<span class="keyword">else</span>,v007=[<span class="string">'Error: '</span> v007];<span class="keyword">end</span>,<span class="keyword">for</span> v008=<span class="keyword">...</span>
-v001.obj(:).',<span class="keyword">try</span> set(v008,<span class="string">'String'</span>,v007);<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> v001.boolean.fid,<span class="keyword">for</span> v009=<span class="keyword">...</span>
-v001.fid(:).',<span class="keyword">try</span> fprintf(v009,<span class="string">'Error: %s\n%s'</span>,v003,v005);<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> v001.boolean.fcn,<span class="keyword">...</span>
-<span class="keyword">if</span> ismember(v000,{v004.name}),error(<span class="string">'prevent recursion'</span>),<span class="keyword">end</span>,<span class="keyword">for</span> v010=v001.fcn(:).',<span class="keyword">if</span> <span class="keyword">...</span>
-isfield(v010,<span class="string">'data'</span>),<span class="keyword">try</span> feval(v010.h,<span class="string">'error'</span>,v006,v010.data);<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">else</span>,<span class="keyword">try</span> feval(v010.h,<span class="keyword">...</span>
-<span class="string">'error'</span>,v006);<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,rethrow(v006),<span class="keyword">end</span>
-<span class="keyword">function</span> varargout=findND(v000,varargin),<span class="keyword">if</span> ~(isnumeric(v000) || islogical(v000)) || <span class="keyword">...</span>
-numel(v000)==0,error(<span class="string">'HJW:findND:FirstInput'</span>,<span class="keyword">...</span>
-<span class="string">'Expected first input (X) to be a non-empty numeric or logical array.'</span>),<span class="keyword">end</span>,<span class="keyword">switch</span> nargin,<span class="keyword">case</span> <span class="keyword">...</span>
-1,v001=<span class="string">'first'</span>;v002=inf;<span class="keyword">case</span> 2,v001=<span class="string">'first'</span>;v002=varargin{1};<span class="keyword">if</span> ~(isnumeric(v002) || <span class="keyword">...</span>
-islogical(v002)) || numel(v002)~=1 || any(v002&lt;0),error(<span class="string">'HJW:findND:SecondInput'</span>,<span class="keyword">...</span>
-<span class="string">'Expected second input (K) to be a positive numeric or logical scalar.'</span>),<span class="keyword">end</span>,<span class="keyword">case</span> 3,v002=<span class="keyword">...</span>
-varargin{1};<span class="keyword">if</span> ~(isnumeric(v002) || islogical(v002)) || numel(v002)~=1 || any(v002&lt;0),<span class="keyword">...</span>
-error(<span class="string">'HJW:findND:SecondInput'</span>,<span class="keyword">...</span>
-<span class="string">'Expected second input (K) to be a positive numeric or logical scalar.'</span>),<span class="keyword">end</span>,v001=varargin{2};
-<span class="keyword">if</span> ~isa(v001,<span class="string">'char'</span>) || ~( strcmpi(v001,<span class="string">'first'</span>) || strcmpi(v001,<span class="string">'last'</span>)),<span class="keyword">...</span>
-error(<span class="string">'HJW:findND:ThirdInput'</span>,<span class="string">'Third input must be either ''first'' or ''last''.'</span>),<span class="keyword">end</span>,v001=<span class="keyword">...</span>
-lower(v001);<span class="keyword">otherwise</span>,error(<span class="string">'HJW:findND:InputNumber'</span>,<span class="string">'Incorrect number of inputs.'</span>),<span class="keyword">end</span>,v003=<span class="keyword">...</span>
-length(size(v000));<span class="keyword">if</span> nargout&gt;1 &amp;&amp; nargout&lt;v003,error(<span class="string">'HJW:findND:Output'</span>,<span class="keyword">...</span>
-<span class="string">'Incorrect number of output arguments.'</span>),<span class="keyword">end</span>,<span class="keyword">persistent</span> v004,<span class="keyword">if</span> isempty(v004),v004=<span class="keyword">...</span>
-ifversion(<span class="string">'&lt;'</span>,7,<span class="string">'Octave'</span>,<span class="string">'&lt;'</span>,3);<span class="keyword">end</span>,varargout=cell(nargout,1);<span class="keyword">if</span> v004,<span class="keyword">if</span> nargout&gt;v003,[v005,<span class="keyword">...</span>
-v006,v007]=find(v000(:));<span class="keyword">if</span> length(v005)&gt;v002,<span class="keyword">if</span> strcmp(v001,<span class="string">'first'</span>),v005=v005(1:v002);v007=<span class="keyword">...</span>
-v007(1:v002);<span class="keyword">else</span>,v005=v005((end-v002+1):end);v007=v007((end-v002+1):end);<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">...</span>
-[varargout{1:(end-1)}] = ind2sub(size(v000),v005);varargout{end}=v007;<span class="keyword">else</span>,v005=find(v000);<span class="keyword">if</span> <span class="keyword">...</span>
-length(v005)&gt;v002,<span class="keyword">if</span> strcmp(v001,<span class="string">'first'</span>),v005=v005(1:v002);<span class="keyword">else</span>,v005=v005((end-v002):end);<span class="keyword">end</span>,<span class="keyword">...</span>
-<span class="keyword">end</span>,[varargout{:}] = ind2sub(size(v000),v005);<span class="keyword">end</span>,<span class="keyword">else</span>,<span class="keyword">if</span> nargout&gt;v003,[v005,v006,v007]=<span class="keyword">...</span>
-find(v000(:),v002,v001);[varargout{1:(end-1)}] = ind2sub(size(v000),v005);varargout{end}=v007;
-<span class="keyword">else</span>,v005=find(v000,v002,v001);[varargout{:}] = ind2sub(size(v000),v005);<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> [v000,v001]=get_trace(v002,v001),<span class="keyword">if</span> nargin==0,v002=1;<span class="keyword">end</span>,<span class="keyword">if</span> nargin&lt;2, v001=dbstack;<span class="keyword">end</span>,<span class="keyword">...</span>
-v001(1:v002)=[];<span class="keyword">if</span> ~isfield(v001,<span class="string">'file'</span>),<span class="keyword">for</span> v003=1:numel(v001),v004=v001(v003).name;<span class="keyword">if</span> <span class="keyword">...</span>
-strcmp(v004(end),<span class="string">')'</span>),v005=strfind(v004,<span class="string">'('</span>);v006=v004( (v005(end)+1):(end-1) );v007=<span class="keyword">...</span>
-v004(1:(v005(end)-2));<span class="keyword">else</span>,v007=v004;[v008,v006]=fileparts(v004);<span class="keyword">end</span>,[v008,v001(v003).file]=<span class="keyword">...</span>
-fileparts(v007);v001(v003).name=v006;<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">persistent</span> v009,<span class="keyword">if</span> isempty(v009),v009=<span class="keyword">...</span>
-exist(<span class="string">'OCTAVE_VERSION'</span>,<span class="string">'builtin'</span>);<span class="keyword">end</span>,<span class="keyword">if</span> v009,<span class="keyword">for</span> v003=1:numel(v001),[v008,v001(v003).file]=<span class="keyword">...</span>
-fileparts(v001(v003).file);<span class="keyword">end</span>,<span class="keyword">end</span>,v010=v001;v011=<span class="string">'&gt;'</span>;v000=cell(1,numel(v010)-1);<span class="keyword">for</span> v003=<span class="keyword">...</span>
-1:numel(v010),[v012,v010(v003).file,v013]=fileparts(v010(v003).file);<span class="keyword">if</span> v003==numel(v010),<span class="keyword">...</span>
-v010(v003).file=<span class="string">''</span>;<span class="keyword">end</span>,<span class="keyword">if</span> strcmp(v010(v003).file,v010(v003).name),v010(v003).file=<span class="string">''</span>;<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-~isempty(v010(v003).file),v010(v003).file=[v010(v003).file <span class="string">'&gt;'</span>];<span class="keyword">end</span>,v000{v003}=<span class="keyword">...</span>
-sprintf(<span class="string">'%c In %s%s (line %d)\n'</span>,v011,v010(v003).file,v010(v003).name,v010(v003).line);v011=<span class="string">' '</span>;
-<span class="keyword">end</span>,v000=horzcat(v000{:});<span class="keyword">end</span>
-<span class="keyword">function</span> v000=ifversion(v001,v002,v003,v004,v005),<span class="keyword">persistent</span> v006 v007 v008,<span class="keyword">if</span> isempty(v006),<span class="keyword">...</span>
-v008=exist(<span class="string">'OCTAVE_VERSION'</span>, <span class="string">'builtin'</span>);v006=version;v009=strfind(v006,<span class="string">'.'</span>);<span class="keyword">if</span> numel(v009)~=1,<span class="keyword">...</span>
-v006(v009(2):end)=<span class="string">''</span>;v009=v009(1);<span class="keyword">end</span>,v006=[str2double(v006(1:(v009-1))) <span class="keyword">...</span>
-str2double(v006((v009+1):end))];v006=v006(1)+v006(2)/100;v006=round(100*v006);v007={ <span class="string">'R13'</span> 605;
-<span class="string">'R13SP1'</span> 605;<span class="string">'R13SP2'</span> 605;<span class="string">'R14'</span> 700;<span class="string">'R14SP1'</span> 700;<span class="string">'R14SP2'</span> 700;<span class="string">'R14SP3'</span> 701;<span class="string">'R2006a'</span> 702;
-<span class="string">'R2006b'</span> 703;<span class="string">'R2007a'</span> 704;<span class="string">'R2007b'</span> 705;<span class="string">'R2008a'</span> 706;<span class="string">'R2008b'</span> 707;<span class="string">'R2009a'</span> 708;<span class="string">'R2009b'</span> 709;
-<span class="string">'R2010a'</span> 710;<span class="string">'R2010b'</span> 711;<span class="string">'R2011a'</span> 712;<span class="string">'R2011b'</span> 713;<span class="string">'R2012a'</span> 714;<span class="string">'R2012b'</span> 800;<span class="string">'R2013a'</span> 801;
-<span class="string">'R2013b'</span> 802;<span class="string">'R2014a'</span> 803;<span class="string">'R2014b'</span> 804;<span class="string">'R2015a'</span> 805;<span class="string">'R2015b'</span> 806;<span class="string">'R2016a'</span> 900;<span class="string">'R2016b'</span> 901;
-<span class="string">'R2017a'</span> 902;<span class="string">'R2017b'</span> 903;<span class="string">'R2018a'</span> 904;<span class="string">'R2018b'</span> 905;<span class="string">'R2019a'</span> 906;<span class="string">'R2019b'</span> 907;<span class="string">'R2020a'</span> 908;
-<span class="string">'R2020b'</span> 909;<span class="string">'R2021a'</span> 910};<span class="keyword">end</span>,<span class="keyword">if</span> v008,<span class="keyword">if</span> nargin==2,warning(<span class="string">'HJW:ifversion:NoOctaveTest'</span>,<span class="keyword">...</span>
-[<span class="string">'No version test for Octave was provided.'</span>,char(10),<span class="keyword">...</span>
-<span class="string">'This function might return an unexpected outcome.'</span>]),<span class="keyword">if</span> isnumeric(v002),v010=<span class="keyword">...</span>
-0.1*v002+0.9*fix(v002);v010=round(100*v010);<span class="keyword">else</span>,v011=ismember(v007(:,1),v002);<span class="keyword">if</span> sum(v011)~=1,<span class="keyword">...</span>
-warning(<span class="string">'HJW:ifversion:NotInDict'</span>,<span class="string">'The requested version is not in the hard-coded list.'</span>),v000=<span class="keyword">...</span>
-NaN;<span class="keyword">return</span>,<span class="keyword">else</span>,v010=v007{v011,2};<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">elseif</span> nargin==4,[v001,v010]=deal(v003,v004);v010=<span class="keyword">...</span>
-0.1*v010+0.9*fix(v010);v010=round(100*v010);<span class="keyword">else</span>,[v001,v010]=deal(v004,v005);v010=<span class="keyword">...</span>
-0.1*v010+0.9*fix(v010);v010=round(100*v010);<span class="keyword">end</span>,<span class="keyword">else</span>,<span class="keyword">if</span> isnumeric(v002),v010=<span class="keyword">...</span>
-0.1*v002+0.9*fix(v002);v010=round(100*v010);<span class="keyword">else</span>,v011=ismember(v007(:,1),v002);<span class="keyword">if</span> sum(v011)~=1,<span class="keyword">...</span>
-warning(<span class="string">'HJW:ifversion:NotInDict'</span>,<span class="string">'The requested version is not in the hard-coded list.'</span>),v000=<span class="keyword">...</span>
-NaN;<span class="keyword">return</span>,<span class="keyword">else</span>,v010=v007{v011,2};<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">switch</span> v001,<span class="keyword">case</span> <span class="string">'=='</span>, v000= v006 == v010;<span class="keyword">case</span> <span class="keyword">...</span>
-<span class="string">'&lt;'</span> , v000= v006 &lt; v010;<span class="keyword">case</span> <span class="string">'&lt;='</span>, v000= v006 &lt;= v010;<span class="keyword">case</span> <span class="string">'&gt;'</span> , v000= v006 &gt; v010;<span class="keyword">case</span> <span class="string">'&gt;='</span>, <span class="keyword">...</span>
-v000= v006 &gt;= v010;<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> [v000,v001]=isnetavl(v002),<span class="keyword">if</span> nargin==0, v003=false;<span class="keyword">else</span>,[v004,v005]=<span class="keyword">...</span>
-test_if_scalar_logical(v002);v003=v004&amp;&amp;v005;<span class="keyword">end</span>,<span class="keyword">if</span> v003,[v000,v001]=isnetavl___ping_via_html;
-<span class="keyword">return</span>,<span class="keyword">end</span>,v003=isnetavl__ICMP_is_blocked;<span class="keyword">if</span> isempty(v003),v000=0;v001=0;<span class="keyword">else</span>,<span class="keyword">if</span> v003,[v000,<span class="keyword">...</span>
-v001]=isnetavl___ping_via_html;<span class="keyword">else</span>,[v000,v001]=isnetavl___ping_via_system;<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> [v004,v005]=isnetavl___ping_via_html,<span class="keyword">persistent</span> v000,<span class="keyword">if</span> isempty(v000),<span class="keyword">try</span> v001=<span class="keyword">...</span>
-isempty(which(func2str(@webread)));<span class="keyword">catch</span>,v001=true;<span class="keyword">end</span>,v000=~v001;<span class="keyword">end</span>,<span class="keyword">try</span> v002=now;<span class="keyword">if</span> v000,v003=<span class="keyword">...</span>
-webread(<span class="string">'http://google.com'</span>);<span class="keyword">else</span>,v003=urlread(<span class="string">'http://google.com'</span>);<span class="keyword">end</span>,v004=1;v005=<span class="keyword">...</span>
-(now-v002)*24*3600*1000;<span class="keyword">catch</span>,v004=0;v005=0;<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> [v003,v006]=isnetavl___ping_via_system,<span class="keyword">if</span> ispc,<span class="keyword">try</span> [v000,v001]=<span class="keyword">...</span>
-system(<span class="string">'ping -n 1 8.8.8.8'</span>);v002=v001(strfind(v001,<span class="string">' = '</span>)+3);v002=v002(1:3);<span class="keyword">if</span> ~strcmp(v002,<span class="keyword">...</span>
-<span class="string">'110'</span>),error(<span class="string">'trigger error'</span>),<span class="keyword">else</span>,v003=1;[v004,v005]=regexp(v001,<span class="string">' [0-9]+ms'</span>);v006=<span class="keyword">...</span>
-v001((v004(1)+1):(v005(1)-2));v006=str2double(v006);<span class="keyword">end</span>,<span class="keyword">catch</span>,v003=0;v006=0;<span class="keyword">end</span>,<span class="keyword">elseif</span> isunix,<span class="keyword">...</span>
-<span class="keyword">try</span> [v000,v001]=system(<span class="string">'ping -c 1 8.8.8.8'</span>);v007=regexp(v001,<span class="string">', [01] '</span>);<span class="keyword">if</span> v001(v007+2)~=<span class="string">'1'</span>,<span class="keyword">...</span>
-error(<span class="string">'trigger error'</span>),<span class="keyword">else</span>,v003=1;[v004,v005]=regexp(v001,<span class="string">'=[0-9.]+ ms'</span>);v006=<span class="keyword">...</span>
-v001((v004(1)+1):(v005(1)-2));v006=str2double(v006);<span class="keyword">end</span>,<span class="keyword">catch</span>,v003=0;v006=0;<span class="keyword">end</span>,<span class="keyword">else</span>,<span class="keyword">...</span>
-error(<span class="string">'How did you even get Matlab to work?'</span>),<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> [v001,v002,v003]=isnetavl__ICMP_is_blocked,<span class="keyword">persistent</span> v000,<span class="keyword">if</span> ~isempty(v000),v001=v000;
-<span class="keyword">return</span>,<span class="keyword">end</span>,[v002,v003]=isnetavl___ping_via_system;<span class="keyword">if</span> v002,v000=false;v001=false;<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">...</span>
-[v002,v003]=isnetavl___ping_via_html;<span class="keyword">if</span> v002,v000=true;v001=true;<span class="keyword">return</span>,<span class="keyword">end</span>,v001=[];<span class="keyword">end</span>
-<span class="keyword">function</span> v000=parse_warning_error_redirect_options(v000),<span class="keyword">if</span> ~isfield(v000,<span class="string">'boolean'</span>),<span class="keyword">...</span>
-v000.boolean=struct;<span class="keyword">end</span>,<span class="keyword">if</span> ~isfield(v000.boolean,<span class="string">'con'</span>) || isempty(v000.boolean.con),<span class="keyword">...</span>
-v000.boolean.con=false;<span class="keyword">end</span>,<span class="keyword">if</span> ~isfield(v000.boolean,<span class="string">'fid'</span>) || isempty(v000.boolean.fid),<span class="keyword">...</span>
-v000.boolean.fid=isfield(v000,<span class="string">'fid'</span>);<span class="keyword">end</span>,<span class="keyword">if</span> ~isfield(v000.boolean,<span class="string">'obj'</span>) || <span class="keyword">...</span>
-isempty(v000.boolean.obj),v000.boolean.obj=isfield(v000,<span class="string">'obj'</span>);<span class="keyword">end</span>,<span class="keyword">if</span> ~isfield(v000.boolean,<span class="keyword">...</span>
-<span class="string">'fcn'</span>) || isempty(v000.boolean.fcn),v000.boolean.fcn=isfield(v000,<span class="string">'fcn'</span>);<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=PatternReplace(v001,v002,v003),v000=v001(:)';<span class="keyword">if</span> numel(v002)==0,v004=<span class="keyword">...</span>
-false(size(v001));<span class="keyword">elseif</span> numel(v003)&gt;numel(v002),error(<span class="string">'not implemented (padding required)'</span>),<span class="keyword">...</span>
-<span class="keyword">else</span>,v004=true(size(v001));<span class="keyword">for</span> v005=1:numel(v002),v006=find(v001==v002(v005));v006=v006-v005+1;
-v006(v006&lt;1)=[];v007=false(size(v004));v007(v006)=true;v004= v004 &amp; v007;<span class="keyword">if</span> ~any(v004),<span class="keyword">break</span>,<span class="keyword">...</span>
-<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,v006=find(v004);<span class="keyword">if</span> ~isempty(v006),<span class="keyword">for</span> v005=1:numel(v003),v000(v006+v005-1)=<span class="keyword">...</span>
-v003(v005);<span class="keyword">end</span>,<span class="keyword">if</span> numel(v003)==0,v005=0;<span class="keyword">end</span>,<span class="keyword">if</span> numel(v002)&gt;v005,v006=v006(:);v008=<span class="keyword">...</span>
-(v005+1):numel(v002);v009=bsxfun_plus(v006,v008-1);v000(v009(:))=[];<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> [v000,v001,v002,v003]=parse_warning_error_redirect_inputs(varargin),<span class="keyword">if</span> nargin==1,<span class="keyword">if</span> <span class="keyword">...</span>
-isa(varargin{1},<span class="string">'struct'</span>) || isa(varargin{1},<span class="string">'MException'</span>),v004=varargin{1};<span class="keyword">try</span> v002=v004.stack;
-v003=get_trace(0,v002);<span class="keyword">catch</span>,[v003,v002]=get_trace(3);<span class="keyword">end</span>,v000=v004.identifier;v001=<span class="keyword">...</span>
-v004.message;v005=<span class="keyword">...</span>
-<span class="string">'Error using &lt;a href="matlab:matlab.internal.language.introspective.errorDocCallback('</span>;<span class="keyword">if</span> <span class="keyword">...</span>
-isa(v004,<span class="string">'struct'</span>) &amp;&amp; numel(v001)&gt;numel(v005) &amp;&amp; strcmp(v005,v001(1:numel(v005))),<span class="keyword">...</span>
-v001(1:find(v001==10,1))=<span class="string">''</span>;<span class="keyword">end</span>,<span class="keyword">else</span>,[v003,v002]=get_trace(3);[v000,v001]=deal(<span class="string">''</span>,varargin{1});
-<span class="keyword">end</span>,<span class="keyword">else</span>,[v003,v002]=get_trace(3);<span class="keyword">if</span> ~isempty(strfind(varargin{1},<span class="string">'%'</span>)),v000=<span class="string">''</span>;v006=<span class="keyword">...</span>
-varargin(2:end);v001=sprintf(varargin{1},v006{:});<span class="keyword">else</span>,v000=varargin{1};v001=varargin{2};<span class="keyword">if</span> <span class="keyword">...</span>
-nargin&gt;3,v006=varargin(3:end);v001=sprintf(v001,v006{:});<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=readfile(v001,varargin),<span class="keyword">if</span> nargin&lt;1,error(<span class="string">'HJW:readfile:nargin'</span>,<span class="keyword">...</span>
-<span class="string">'Incorrect number of input argument.'</span>),<span class="keyword">end</span>,<span class="keyword">if</span> ~(nargout==0 || nargout==1),<span class="keyword">...</span>
-error(<span class="string">'HJW:readfile:nargout'</span>,<span class="string">'Incorrect number of output argument.'</span>),<span class="keyword">end</span>,[v002,v003,v004]=<span class="keyword">...</span>
-readfile_parse_inputs(v001,varargin{:});<span class="keyword">if</span> ~v002,rethrow(v004),<span class="keyword">else</span>,[v005,v006,v007,v008,v009,<span class="keyword">...</span>
-v010,v011,v012,v013]=deal(v003.print_2__options,v003.legacy,v003.UseURLread,v003.err_on_ANSI,<span class="keyword">...</span>
-v003.EmptyLineRule,v003.Whitespace,v003.LineEnding,v003.FailMultiword_UTF16,<span class="keyword">...</span>
-v003.WhitespaceRule);<span class="keyword">end</span>,<span class="keyword">if</span> isa(v001,<span class="string">'string'</span>),v001=char(v001);<span class="keyword">end</span>,<span class="keyword">if</span> numel(v001)&gt;=8 &amp;&amp; ( <span class="keyword">...</span>
-strcmpi(v001(1:7),<span class="string">'http://'</span>) || strcmpi(v001(1:8),<span class="string">'https://'</span>) ),<span class="keyword">if</span> ~v006.allows_https &amp;&amp; <span class="keyword">...</span>
-strcmpi(v001(1:8),<span class="string">'https://'</span>),warning_(v005,<span class="string">'HJW:readfile:httpsNotSupported'</span>,<span class="keyword">...</span>
-[<span class="string">'This implementation of urlread probably doesn''t allow https requests.'</span>,char(10),<span class="keyword">...</span>
-<span class="string">'The next lines of code will probably result in an error.'</span>]),<span class="keyword">end</span>,v014=readfile_from_URL(v001,<span class="keyword">...</span>
-v007,v005,v011,v008);<span class="keyword">if</span> isa(v014,<span class="string">'cell'</span>),v000=v014;<span class="keyword">else</span>,v015=true;v014=<span class="keyword">...</span>
-convert_from_codepage(v014,v015);<span class="keyword">try</span> v004=[];[v016,v017,v018]=UTF8_to_unicode(v014);<span class="keyword">catch</span> v004;
-<span class="keyword">if</span> isempty(v004),v004=lasterror;<span class="keyword">end</span>,<span class="keyword">if</span> strcmp(v004.identifier,<span class="string">'HJW:UTF8_to_unicode:notUTF8'</span>),<span class="keyword">...</span>
-v017=false;<span class="keyword">else</span>,error_(v005,v004),<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> v017,v014=unicode_to_char(v018);<span class="keyword">end</span>,<span class="keyword">if</span> isa(v011,<span class="keyword">...</span>
-<span class="string">'double'</span>) &amp;&amp; isempty(v011),v000=char2cellstr(v014);<span class="keyword">else</span>,v000=char2cellstr(v014,v011);<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">...</span>
-<span class="keyword">else</span>,v000=readfile_from_file(v001,v011,v005,v008);<span class="keyword">end</span>,<span class="keyword">if</span> ~strcmp(v009,<span class="string">'read'</span>) || ~strcmp(v013,<span class="keyword">...</span>
-<span class="string">'preserve'</span>),v019=cellfun(<span class="string">'isempty'</span>,v000);<span class="keyword">for</span> v020=find(~v019).',v021=ismember(v000{v020},v010);
-v019(v020)=all(v021);<span class="keyword">if</span> ~strcmp(v013,<span class="string">'preserve'</span>),<span class="keyword">if</span> v019(v020),v000{v020}=<span class="string">''</span>;<span class="keyword">continue</span>,<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-~v021(1) &amp;&amp; ~v021(end),<span class="keyword">continue</span>,<span class="keyword">end</span>,<span class="keyword">switch</span> v013,<span class="keyword">case</span> <span class="string">'trim'</span>,v022=find(~v021);v022=v022([1 end]);
-<span class="keyword">case</span> <span class="string">'trimleading'</span>,v022=[findND(~v021,1) numel(v021)];<span class="keyword">case</span> <span class="string">'trimtrailing'</span>,v022=[1 findND(~v021,<span class="keyword">...</span>
-1,<span class="string">'last'</span>)];<span class="keyword">end</span>,v000{v020}=v000{v020}(v022(1):v022(2));<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> ~strcmp(v009,<span class="string">'read'</span>),<span class="keyword">...</span>
-<span class="keyword">switch</span> v009,<span class="keyword">case</span> <span class="string">'skip'</span>,v000(v019)=[];<span class="keyword">case</span> <span class="string">'error'</span>,<span class="keyword">if</span> any(v019),error_(v005,<span class="keyword">...</span>
-<span class="string">'HJW:readfile:EmptyLinesRuleError'</span>,<span class="string">'Unexpected empty line detected on row %d'</span>,findND(v019,1)),<span class="keyword">...</span>
-<span class="keyword">end</span>,<span class="keyword">case</span> <span class="string">'skipleading'</span>,<span class="keyword">if</span> v019(1),v023=1:(findND(~v019,1,<span class="string">'first'</span>)-1);v000(v023)=[];<span class="keyword">end</span>,<span class="keyword">case</span> <span class="keyword">...</span>
-<span class="string">'skiptrailing'</span>,<span class="keyword">if</span> v019(end),v023=(1+findND(~v019,1,<span class="string">'last'</span>)):numel(v019);v000(v023)=[];<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">...</span>
-<span class="keyword">end</span>,<span class="keyword">persistent</span> v024,<span class="keyword">if</span> isempty(v024),v024 = exist(<span class="string">'OCTAVE_VERSION'</span>, <span class="string">'builtin'</span>) ~= 0;<span class="keyword">end</span>,<span class="keyword">if</span> v012,<span class="keyword">...</span>
-<span class="keyword">for</span> v020=1:numel(v000),<span class="keyword">if</span> v024,<span class="keyword">if</span> any(v000{v020}&gt;=240),v000{v020}=<span class="keyword">...</span>
-replace_multiword_UTF16_by_26(v000{v020});<span class="keyword">end</span>,<span class="keyword">else</span>,<span class="keyword">if</span> any(v000{v020}&gt;=55296 &amp; v000{v020}&lt;=<span class="keyword">...</span>
-56319),v000{v020}=replace_multiword_UTF16_by_26(v000{v020});<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=replace_multiword_UTF16_by_26(v001),<span class="keyword">persistent</span> v002,<span class="keyword">if</span> isempty(v002),v002 = <span class="keyword">...</span>
-exist(<span class="string">'OCTAVE_VERSION'</span>, <span class="string">'builtin'</span>) ~= 0;<span class="keyword">end</span>,<span class="keyword">if</span> v002,v003=UTF8_to_unicode(v001);<span class="keyword">else</span>,v003=<span class="keyword">...</span>
-UTF16_to_unicode(v001);<span class="keyword">end</span>,v003(v003&gt;=65536)=26;<span class="keyword">if</span> v002,v000=char(unicode_to_UTF8(v003));<span class="keyword">else</span>,<span class="keyword">...</span>
-v000=char(unicode_to_UTF16(v003));<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=test_syntax,v000=<span class="string">'pass'</span>;<span class="keyword">try</span> readfile(struct(<span class="string">'name'</span>,<span class="string">'foo.txt'</span>));v000=<span class="string">'fail'</span>;<span class="keyword">return</span>,<span class="keyword">...</span>
-<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">try</span> v001=readfile([mfilename <span class="string">'.m'</span>]);<span class="keyword">if</span> size(v001,1)==1,<span class="keyword">...</span>
-error(<span class="string">'result should be nx1, not 1xn'</span>),<span class="keyword">end</span>,<span class="keyword">catch</span>,v000=<span class="string">'fail'</span>;<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">try</span> v002=<span class="keyword">...</span>
-struct(<span class="string">'print_to_con'</span>,true);v003=tempname;<span class="keyword">while</span> exist(v003,<span class="string">'file'</span>),v003=tempname;<span class="keyword">end</span>,<span class="keyword">...</span>
-readfile(v003,v002),<span class="keyword">catch</span>,v004=lasterror;<span class="keyword">if</span> ~strcmp(v004.identifier,<span class="string">'HJW:readfile:ReadFail'</span>),<span class="keyword">...</span>
-v000=<span class="string">'fail'</span>;<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">try</span> readfile(v003,<span class="string">'print_to_con'</span>,true),<span class="keyword">catch</span>,v004=lasterror;<span class="keyword">if</span> <span class="keyword">...</span>
-~strcmp(v004.identifier,<span class="string">'HJW:readfile:ReadFail'</span>),v000=<span class="string">'fail'</span>;<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=readfile_from_file(v001,v002,v003,v004),<span class="keyword">persistent</span> v005,<span class="keyword">if</span> isempty(v005),v005 = <span class="keyword">...</span>
-exist(<span class="string">'OCTAVE_VERSION'</span>, <span class="string">'builtin'</span>) ~= 0;<span class="keyword">end</span>,<span class="keyword">persistent</span> v006,<span class="keyword">if</span> isempty(v006),<span class="keyword">if</span> v005,v007=<span class="keyword">...</span>
-<span class="string">'Octave'</span>;<span class="keyword">else</span>,v007=<span class="string">'Matlab'</span>;<span class="keyword">end</span>,v006=sprintf([<span class="string">'%s could not read the file %%s.\n'</span>,<span class="keyword">...</span>
-<span class="string">'The file doesn''t exist or is not readable.\n'</span>,<span class="keyword">...</span>
-<span class="string">'(Note that for online files, only http and https is supported.)'</span>],v007);<span class="keyword">end</span>,v008=<span class="keyword">...</span>
-struct(<span class="string">'identifier'</span>,<span class="string">'HJW:readfile:ReadFail'</span>,<span class="string">'message'</span>,sprintf(v006,v001));v009=fopen(v001,<span class="string">'rb'</span>);
-<span class="keyword">if</span> v009&lt;0,error_(v003,v008),<span class="keyword">end</span>,v010=fread(v009,<span class="string">'uint8'</span>);fclose(v009);v010=v010.';<span class="keyword">try</span> v011=[];
-v012=true;v013=UTF8_to_unicode(v010);<span class="keyword">catch</span> v011;<span class="keyword">if</span> isempty(v011),v011=lasterror;<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-strcmp(v011.identifier,<span class="string">'HJW:UTF8_to_unicode:notUTF8'</span>),v012=false;<span class="keyword">if</span> v004,error_(v003,<span class="keyword">...</span>
-<span class="string">'HJW:readfile:notUTF8'</span>,<span class="string">'The provided file "%s" is not a correctly encoded UTF-8 file.'</span>,v001),<span class="keyword">...</span>
-<span class="keyword">end</span>,<span class="keyword">else</span>,error_(v003,v011),<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> v005,<span class="keyword">if</span> v012,v000=v013;<span class="keyword">else</span>,<span class="keyword">try</span> v000=fileread(v001);<span class="keyword">catch</span>,<span class="keyword">...</span>
-error_(v003,v008),<span class="keyword">end</span>,v000=convert_from_codepage(v000);<span class="keyword">end</span>,<span class="keyword">else</span>,<span class="keyword">if</span> ispc,<span class="keyword">if</span> v012,v000=v013;<span class="keyword">else</span>,<span class="keyword">...</span>
-<span class="keyword">if</span> ifversion(<span class="string">'&lt;'</span>,7),<span class="keyword">try</span> v000=fileread(v001);<span class="keyword">catch</span>,error_(v003,v008),<span class="keyword">end</span>,v000=<span class="keyword">...</span>
-convert_from_codepage(v000);<span class="keyword">else</span>,<span class="keyword">try</span> v000=fileread(v001);<span class="keyword">catch</span>,error_(v003,v008),<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">...</span>
-<span class="keyword">else</span>,<span class="keyword">if</span> v012,v000=v013;<span class="keyword">else</span>,v000=convert_from_codepage(v010);<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> numel(v000)&gt;=1 &amp;&amp; <span class="keyword">...</span>
-double(v000(1))==65279,v000(1)=[];<span class="keyword">end</span>,v000=unicode_to_char(v000);<span class="keyword">if</span> isa(v002,<span class="string">'double'</span>) &amp;&amp; <span class="keyword">...</span>
-isempty(v002),v000=char2cellstr(v000);<span class="keyword">else</span>,v000=char2cellstr(v000,v002);<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=tmpname(v001,v002),<span class="keyword">if</span> nargin&lt;1,v001=<span class="string">''</span>;<span class="keyword">end</span>,<span class="keyword">if</span> ~isempty(v001),v001=[v001 <span class="string">'_'</span>];<span class="keyword">end</span>,<span class="keyword">...</span>
-<span class="keyword">if</span> nargin&lt;2,v002=<span class="string">''</span>;<span class="keyword">else</span>,<span class="keyword">if</span> ~strcmp(v002(1),<span class="string">'.'</span>),v002=[<span class="string">'.'</span> v002];<span class="keyword">end</span>,<span class="keyword">end</span>,v000=tempname;[v003,<span class="keyword">...</span>
-v004]=fileparts(v000);v000=fullfile(v003,[v001 v004 v002]);<span class="keyword">end</span>
-<span class="keyword">function</span> [v000,v001,v002]=readfile_parse_inputs(v003,varargin),v000=false;v001=struct;v002=<span class="keyword">...</span>
-struct(<span class="string">'identifier'</span>,<span class="string">''</span>,<span class="string">'message'</span>,<span class="string">''</span>);<span class="keyword">if</span> ~( isa(v003,<span class="string">'char'</span>) || isa(v003,<span class="string">'string'</span>) ) || ( <span class="keyword">...</span>
-isa(v003,<span class="string">'string'</span>) &amp;&amp; numel(v003)~=1 ) || ( isa(v003,<span class="string">'char'</span>) &amp;&amp; numel(v003)==0 ),<span class="keyword">...</span>
-v002.identifier=<span class="string">'HJW:readfile:IncorrectInput'</span>;v002.message=<span class="keyword">...</span>
-<span class="string">'The file name must be a non-empty char or a scalar string.'</span>;<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">persistent</span> v004 v005,<span class="keyword">if</span> <span class="keyword">...</span>
-isempty(v004),v006.split = ifversion(<span class="string">'&lt;'</span>,<span class="string">'R2007b'</span>,<span class="string">'Octave'</span>,<span class="string">'&lt;'</span>,4);v006.allows_https=<span class="keyword">...</span>
-ifversion(<span class="string">'&gt;'</span>,0,<span class="string">'Octave'</span>,<span class="string">'&lt;'</span>,0);v004.legacy=v006;<span class="keyword">try</span> v007=isempty(which(func2str(@webread )));
-<span class="keyword">catch</span>,v007=true;<span class="keyword">end</span>,<span class="keyword">try</span> v008=isempty(which(func2str(@websave )));<span class="keyword">catch</span>,v008=true;<span class="keyword">end</span>,<span class="keyword">try</span> v009=<span class="keyword">...</span>
-isempty(which(func2str(@weboptions)));<span class="keyword">catch</span>,v009=true;<span class="keyword">end</span>,v004.UseURLread= v007 || v008 || v009;
-v005=struct;v005.print_to_con=true;v005.print_to_fid=[];v005.print_to_obj=[];v005.print_to_fcn=<span class="keyword">...</span>
-[];v004.print_2__options=validate_print_to__options(v005,v002);v004.err_on_ANSI=false;
-v004.FailMultiword_UTF16=false;v004.EmptyLineRule=<span class="string">'read'</span>;v004.Whitespace=unicode_to_char([8 9 <span class="keyword">...</span>
-28:32 160 5760 8192:8202 8239 8287 12288]);v004.DefaultLineEnding=true;v004.LineEnding=[];
-v004.WhitespaceRule=<span class="string">'preserve'</span>;v004.UseReadlinesDefaults=false;
-v004.ReadlinesDefaults.FailMultiword_UTF16=true;v004.ReadlinesDefaults.Whitespace=<span class="keyword">...</span>
-sprintf(<span class="string">' \b\t'</span>);v010=fieldnames(v004);<span class="keyword">for</span> v011=1:numel(v010),<span class="keyword">if</span> ~isfield(v001,v010(v011)),<span class="keyword">...</span>
-v004.ReadlinesDefaults.(v010{v011})=v004.(v010{v011});<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> nargin==1,v001=v004;v000=<span class="keyword">...</span>
-true;<span class="keyword">return</span>,<span class="keyword">end</span>,v012= nargin==2 &amp;&amp; isa(varargin{1},<span class="string">'struct'</span>);v013=mod(nargin,2)==1 &amp;&amp; all( <span class="keyword">...</span>
-cellfun(<span class="string">'isclass'</span>,varargin(1:2:end),<span class="string">'char'</span> ) | cellfun(<span class="string">'isclass'</span>,varargin(1:2:end),<span class="string">'string'</span>) );
-<span class="keyword">if</span> ~( v012 || v013 ),v002.message=<span class="keyword">...</span>
-[<span class="string">'The second input (options) is expected to be either a struct, '</span>,char(10),<span class="keyword">...</span>
-<span class="string">'or consist of Name,Value pairs.'</span>];v002.identifier=<span class="string">'HJW:readfile:incorrect_input_options'</span>;
-<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">if</span> v013,<span class="keyword">for</span> v014=1:2:numel(varargin),<span class="keyword">try</span> v001.(varargin{v014})=varargin{v014+1};
-<span class="keyword">catch</span>,v002.message=<span class="string">'Parsing of Name,Value pairs failed.'</span>;v002.identifier=<span class="keyword">...</span>
-<span class="string">'HJW:readfile:incorrect_input_NameValue'</span>;<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">else</span>,v001=varargin{1};<span class="keyword">end</span>,v015=false;
-v016=v005;v017=v004;v010=fieldnames(v001);<span class="keyword">for</span> v011=1:numel(v010),v018=v010{v011};v019=<span class="keyword">...</span>
-v001.(v018);v002.identifier=[<span class="string">'HJW:readfile:incorrect_input_opt_'</span> lower(v018)];<span class="keyword">switch</span> v018,<span class="keyword">case</span> <span class="keyword">...</span>
-<span class="string">'UseURLread'</span>,[v020,v019]=test_if_scalar_logical(v019);<span class="keyword">if</span> ~v020,v002.message=<span class="keyword">...</span>
-<span class="string">'UseURLread should be either true or false'</span>;<span class="keyword">return</span>,<span class="keyword">end</span>,v001.UseURLread=v019 || v004.UseURLread;
-<span class="keyword">case</span> <span class="string">'err_on_ANSI'</span>,[v020,v019]=test_if_scalar_logical(v019);<span class="keyword">if</span> ~v020,v002.message=<span class="keyword">...</span>
-<span class="string">'err_on_ANSI should be either true or false'</span>;<span class="keyword">return</span>,<span class="keyword">end</span>,v001.err_on_ANSI=v019;<span class="keyword">case</span> <span class="keyword">...</span>
-<span class="string">'print_to_fid'</span>,v015=true;v016.print_to_fid=v019;<span class="keyword">case</span> <span class="string">'print_to_obj'</span>,v015=true;v016.print_to_obj=<span class="keyword">...</span>
-v019;<span class="keyword">case</span> <span class="string">'print_to_fcn'</span>,v015=true;v016.print_to_fcn=v019;<span class="keyword">case</span> <span class="string">'print_to_con'</span>,v015=true;
-v016.print_to_con=v019;<span class="keyword">case</span> <span class="string">'EmptyLineRule'</span>,<span class="keyword">if</span> isa(v019,<span class="string">'string'</span>),<span class="keyword">if</span> numel(v019)~=1,v019=[];
-<span class="keyword">else</span>,v019=char(v019);<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> isa(v019,<span class="string">'char'</span>),v019=lower(v019);<span class="keyword">end</span>,<span class="keyword">if</span> ~isa(v019,<span class="string">'char'</span>) || <span class="keyword">...</span>
-~ismember(v019,{<span class="string">'read'</span>,<span class="string">'skip'</span>,<span class="string">'error'</span>,<span class="string">'skipleading'</span>,<span class="string">'skiptrailing'</span>}),v002.message=<span class="keyword">...</span>
-<span class="string">'EmptyLineRule must be a char or string with a specific value.'</span>;<span class="keyword">return</span>,<span class="keyword">end</span>,v001.EmptyLineRule=<span class="keyword">...</span>
-v019;<span class="keyword">case</span> <span class="string">'Whitespace'</span>,<span class="keyword">try</span> <span class="keyword">switch</span> class(v019),<span class="keyword">case</span> <span class="string">'string'</span>,<span class="keyword">if</span> numel(v019)~=1,<span class="keyword">...</span>
-error(<span class="string">'trigger error'</span>),<span class="keyword">end</span>,v019=char(v019);<span class="keyword">case</span> <span class="string">'cell'</span>,<span class="keyword">for</span> v014=1:numel(v019),v019{v014}=<span class="keyword">...</span>
-sprintf(v019{v014});<span class="keyword">end</span>,v019=horzcat(v019{:});<span class="keyword">case</span> <span class="string">'char'</span>,<span class="keyword">otherwise</span>,error(<span class="string">'trigger error'</span>),<span class="keyword">end</span>,<span class="keyword">...</span>
-v001.Whitespace=v019;<span class="keyword">catch</span>,v002.message=<span class="keyword">...</span>
-[<span class="string">'The Whitespace parameter must be a char vector, string scalar or '</span>,<span class="keyword">...</span>
-<span class="string">'cellstr.\nA cellstr input must be parsable by sprintf.'</span>];<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">case</span> <span class="string">'WhitespaceRule'</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-isa(v019,<span class="string">'string'</span>),<span class="keyword">if</span> numel(v019)~=1,v019=[];<span class="keyword">else</span>,v019=char(v019);<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> isa(v019,<span class="string">'char'</span>),<span class="keyword">...</span>
-v019=lower(v019);<span class="keyword">end</span>,<span class="keyword">if</span> ~isa(v019,<span class="string">'char'</span>) || ~ismember(v019,{<span class="string">'preserve'</span>,<span class="string">'trim'</span>,<span class="string">'trimleading'</span>,<span class="keyword">...</span>
-<span class="string">'trimtrailing'</span>}),v002.message=<span class="string">'WhitespaceRule must be a char or string with a specific value.'</span>;
-<span class="keyword">return</span>,<span class="keyword">end</span>,v001.WhitespaceRule=v019;<span class="keyword">case</span> <span class="string">'LineEnding'</span>,v021=false;<span class="keyword">if</span> isa(v019,<span class="string">'string'</span>),v019=<span class="keyword">...</span>
-cellstr(v019);<span class="keyword">if</span> numel(v019)==1,v019=v019{1};<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> isa(v019,<span class="string">'cell'</span>),<span class="keyword">try</span> <span class="keyword">for</span> v014=<span class="keyword">...</span>
-1:numel(v019),v019{v014}=sprintf(v019{v014});<span class="keyword">end</span>,<span class="keyword">catch</span>,v021=true;<span class="keyword">end</span>,<span class="keyword">elseif</span> isa(v019,<span class="string">'char'</span>),<span class="keyword">...</span>
-v019={v019};<span class="keyword">else</span>,v021=true;<span class="keyword">end</span>,<span class="keyword">if</span> v021 || ~iscellstr(v019),v002.message=<span class="keyword">...</span>
-[<span class="string">'The LineEnding parameter must be a char vector, a string or a '</span>,<span class="keyword">...</span>
-<span class="string">'cellstr.\nA cellstr or string vector input must be parsable by sprintf.'</span>];<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-isequal(v019,{char(10) char(13) char([13 10])}),v001.LineEnding=[];<span class="keyword">else</span>,v001.LineEnding=v019;
-<span class="keyword">end</span>,<span class="keyword">case</span> <span class="string">'UseReadlinesDefaults'</span>,[v020,v019]=test_if_scalar_logical(v019);<span class="keyword">if</span> ~v020,v002.message=<span class="keyword">...</span>
-<span class="string">'UseReadlinesDefaults should be either true or false'</span>;<span class="keyword">return</span>,<span class="keyword">end</span>,v001.UseReadlinesDefaults=v019;
-<span class="keyword">if</span> v001.UseReadlinesDefaults,v017=v004.ReadlinesDefaults;<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> v015,v002.identifier=<span class="keyword">...</span>
-<span class="string">'HJW:readfile:incorrect_input_opt_print_to_'</span>;[v019,v002]=validate_print_to__options(v016,v002);
-<span class="keyword">if</span> isempty(v019),<span class="keyword">return</span>,<span class="keyword">end</span>,v001.print_2__options=v019;<span class="keyword">else</span>,v001.print_2__options=<span class="keyword">...</span>
-v017.print_2__options;<span class="keyword">end</span>,v010=fieldnames(v017);<span class="keyword">for</span> v011=1:numel(v010),<span class="keyword">if</span> ~isfield(v001,<span class="keyword">...</span>
-v010(v011)),v001.(v010{v011})=v017.(v010{v011});<span class="keyword">end</span>,<span class="keyword">end</span>,v000=true;v002=[];<span class="keyword">end</span>
-<span class="keyword">function</span> v000=readfile_from_URL(v001,v002,v003,v004,v005),<span class="keyword">try</span> v006=false;v007=<span class="keyword">...</span>
-debug_hook(tmpname(<span class="string">'readfile_from_URL_tmp_'</span>,<span class="string">'.txt'</span>));<span class="keyword">try</span> <span class="keyword">if</span> v002,v007=urlwrite(v001,v007);<span class="keyword">else</span>, <span class="keyword">...</span>
-v007= websave(v007,v001,weboptions(<span class="string">'ContentType'</span>,<span class="string">'raw'</span>));<span class="keyword">end</span>,v000=readfile_from_file(v007,v004,<span class="keyword">...</span>
-v003,v005);<span class="keyword">catch</span>,v006=true;<span class="keyword">end</span>,<span class="keyword">try</span> <span class="keyword">if</span> exist(v007,<span class="string">'file'</span>),delete(v007);<span class="keyword">end</span>,<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">if</span> v006,<span class="keyword">...</span>
-error(<span class="string">'revert to urlread'</span>),<span class="keyword">end</span>,<span class="keyword">catch</span>,<span class="keyword">try</span> v008=[];<span class="keyword">if</span> v002,v000=urlread(v001);<span class="keyword">else</span>,v000=<span class="keyword">...</span>
-webread(v001,weboptions(<span class="string">'ContentType'</span>,<span class="string">'raw'</span>));<span class="keyword">end</span>,<span class="keyword">catch</span> v008;<span class="keyword">if</span> isempty(v008),v008=lasterror;
-<span class="keyword">end</span>,error_(v003,v008),<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> [v000,v001]=test_if_scalar_logical(v001),<span class="keyword">persistent</span> v002,<span class="keyword">if</span> isempty(v002),v002={true,<span class="keyword">...</span>
-false;1,0;<span class="string">'on'</span>,<span class="string">'off'</span>;<span class="string">'enable'</span>,<span class="string">'disable'</span>;<span class="string">'enabled'</span>,<span class="string">'disabled'</span>};<span class="keyword">try</span> v002(end+1,:)=<span class="keyword">...</span>
-eval(<span class="string">'{"on","off"}'</span>);<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,v000=true;<span class="keyword">try</span> <span class="keyword">if</span> isa(v001,<span class="string">'char'</span>) || isa(v001,<span class="string">'string'</span>),<span class="keyword">try</span> <span class="keyword">...</span>
-v001=lower(v001);<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">for</span> v003=1:size(v002,1),<span class="keyword">for</span> v004=1:2,<span class="keyword">if</span> isequal(v001,v002{v003,<span class="keyword">...</span>
-v004}),v001=v002{1,v004};<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> isa(v001,<span class="string">'matlab.lang.OnOffSwitchState'</span>),v001=<span class="keyword">...</span>
-logical(v001);<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">catch</span>,<span class="keyword">end</span>,v000=false;<span class="keyword">end</span>
-<span class="keyword">function</span> v000=unicode_to_char(v001,v002),<span class="keyword">persistent</span> v003,<span class="keyword">if</span> isempty(v003),v003 = <span class="keyword">...</span>
-exist(<span class="string">'OCTAVE_VERSION'</span>, <span class="string">'builtin'</span>) ~= 0;<span class="keyword">end</span>,<span class="keyword">if</span> nargin==1,v002=~v003;<span class="keyword">end</span>,<span class="keyword">if</span> v002,<span class="keyword">if</span> <span class="keyword">...</span>
-all(v001&lt;65536),v000=uint16(v001);v000=reshape(v000,1,numel(v000));<span class="keyword">else</span>,[v004,v005,v006]=<span class="keyword">...</span>
-unique(v001);v000=cell(1,numel(v001));<span class="keyword">for</span> v007=1:numel(v004),v008=unicode_to_UTF16(v004(v007));
-v008=uint16(v008);v000(v006==v007)={v008};<span class="keyword">end</span>,v000=cell2mat(v000);<span class="keyword">end</span>,<span class="keyword">if</span> ~v003,v000=char(v000);
-<span class="keyword">end</span>,<span class="keyword">else</span>,<span class="keyword">if</span> all(v001&lt;128),v000=char(v001);v000=reshape(v000,1,numel(v000));<span class="keyword">else</span>,[v004,v005,<span class="keyword">...</span>
-v006]=unique(v001);v000=cell(1,numel(v001));<span class="keyword">for</span> v007=1:numel(v004),v008=<span class="keyword">...</span>
-unicode_to_UTF8(v004(v007));v008=uint8(v008);v000(v006==v007)={v008};<span class="keyword">end</span>,v000=cell2mat(v000);
-v000=char(v000);<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=unicode_to_UTF8(v001),<span class="keyword">if</span> v001&lt;128,v000=v001;<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">persistent</span> v002,<span class="keyword">if</span> <span class="keyword">...</span>
-isempty(v002),v002=struct;v002.limits.lower=hex2dec({<span class="string">'0000'</span>,<span class="string">'0080'</span>,<span class="string">'0800'</span>, <span class="string">'10000'</span>});
-v002.limits.upper=hex2dec({<span class="string">'007F'</span>,<span class="string">'07FF'</span>,<span class="string">'FFFF'</span>,<span class="string">'10FFFF'</span>});v002.scheme{2}=<span class="string">'110xxxxx10xxxxxx'</span>;
-v002.scheme{2}=reshape(v002.scheme{2}.',8,2);v002.scheme{3}=<span class="string">'1110xxxx10xxxxxx10xxxxxx'</span>;
-v002.scheme{3}=reshape(v002.scheme{3}.',8,3);v002.scheme{4}=<span class="string">'11110xxx10xxxxxx10xxxxxx10xxxxxx'</span>;
-v002.scheme{4}=reshape(v002.scheme{4}.',8,4);<span class="keyword">for</span> v003=2:4,v002.scheme_pos{v003}=<span class="keyword">...</span>
-find(v002.scheme{v003}==<span class="string">'x'</span>);v002.bits(v003)=numel(v002.scheme_pos{v003});<span class="keyword">end</span>,<span class="keyword">end</span>,v004=<span class="keyword">...</span>
-find(v002.limits.lower&lt;=v001 &amp; v001&lt;=v002.limits.upper);v000=v002.scheme{v004};v005=<span class="keyword">...</span>
-v002.scheme_pos{v004};v003=dec2bin(v001,v002.bits(v004));v000(v005)=v003;v000=bin2dec(v000.').';
-<span class="keyword">end</span>
-<span class="keyword">function</span> [v000,v001,v002]=UTF8_to_unicode_internal(v000,v003),v001=<span class="string">'success'</span>;v002=<span class="keyword">...</span>
-struct(<span class="string">'identifier'</span>,<span class="string">'HJW:UTF8_to_unicode:notUTF8'</span>,<span class="string">'message'</span>,<span class="string">'Input is not UTF-8.'</span>);<span class="keyword">persistent</span> <span class="keyword">...</span>
-v004,<span class="keyword">if</span> isempty(v004),v004 = exist(<span class="string">'OCTAVE_VERSION'</span>, <span class="string">'builtin'</span>) ~= 0;<span class="keyword">end</span>,<span class="keyword">if</span> any(v000&gt;255),v001=<span class="keyword">...</span>
-<span class="string">'error'</span>;<span class="keyword">if</span> v003,<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">elseif</span> all(v000&lt;128),<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">for</span> v005=4:-1:2,v006=<span class="keyword">...</span>
-bin2dec([repmat(<span class="string">'1'</span>,1,v005) repmat(<span class="string">'0'</span>,1,8-v005)]);v007=v000&gt;=v006 &amp; v000&lt;256;<span class="keyword">if</span> any(v007),v007=<span class="keyword">...</span>
-find(v007);v007=v007(:).';<span class="keyword">if</span> numel(v000)&lt;(max(v007)+v005-1),v001=<span class="string">'error'</span>;<span class="keyword">if</span> v003,<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">...</span>
-v007( (v007+v005-1)&gt;numel(v000) )=[];<span class="keyword">end</span>,<span class="keyword">if</span> ~isempty(v007),v008=bsxfun_plus(v007 , <span class="keyword">...</span>
-(0:(v005-1)).' );v008=v008.';v007=v000(v008);<span class="keyword">end</span>,<span class="keyword">else</span>,v007=[];<span class="keyword">end</span>,v009=[repmat(<span class="string">'1'</span>,1,v005-1) <span class="keyword">...</span>
-repmat(<span class="string">'10'</span>,1,v005)];v010=unique([1:(v005+1) 1:8:(8*v005) 2:8:(8*v005)]);<span class="keyword">if</span> numel(v007)&gt;0,v007=<span class="keyword">...</span>
-unique(v007,<span class="string">'rows'</span>);v011=mat2cell(v007,ones(size(v007,1),1),v005);<span class="keyword">for</span> v012=1:numel(v011),v013=<span class="keyword">...</span>
-dec2bin(double(v011{v012}))';<span class="keyword">if</span> ~strcmp(v009,v013(v010)),v001=<span class="string">'error'</span>;<span class="keyword">if</span> v003,<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">...</span>
-<span class="keyword">continue</span>,<span class="keyword">end</span>,v013(v010)=<span class="string">''</span>;<span class="keyword">if</span> ~v004,v014=uint32(bin2dec(v013 ));<span class="keyword">else</span>,v014=<span class="keyword">...</span>
-uint32(bin2dec(v013.'));<span class="keyword">end</span>,v000=PatternReplace(v000,v011{v012},v014);<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=UTF16_to_unicode(v001),<span class="keyword">persistent</span> v002,<span class="keyword">if</span> isempty(v002),v002 = <span class="keyword">...</span>
-exist(<span class="string">'OCTAVE_VERSION'</span>, <span class="string">'builtin'</span>) ~= 0;<span class="keyword">end</span>,v001=uint32(v001);v003= v001&gt;55295 &amp; v001&lt;57344;<span class="keyword">if</span> <span class="keyword">...</span>
-~any(v003),v000=v001;<span class="keyword">return</span>,<span class="keyword">end</span>,v004= find( v001&gt;=55296 &amp; v001&lt;=56319 );v005= find( v001&gt;=56320 <span class="keyword">...</span>
-&amp; v001&lt;=57343 );<span class="keyword">try</span> v006=v005-v004;<span class="keyword">if</span> any(v006~=1),error(<span class="string">'trigger error'</span>),<span class="keyword">end</span>,<span class="keyword">catch</span>,<span class="keyword">...</span>
-error(<span class="string">'input is not valid UTF-16 encoded'</span>),<span class="keyword">end</span>,v007=<span class="string">'110110110111'</span>;v008=[1:6 17:22];v003=<span class="keyword">...</span>
-v001([v004.' v005.']);v003=unique(v003,<span class="string">'rows'</span>);v009=mat2cell(v003,ones(size(v003,1),1),2);v000=<span class="keyword">...</span>
-v001;<span class="keyword">for</span> v010=1:numel(v009),v011=dec2bin(double(v009{v010}))';<span class="keyword">if</span> ~strcmp(v007,v011(v008)),<span class="keyword">...</span>
-error(<span class="string">'input is not valid UTF-16 encoded'</span>),<span class="keyword">end</span>,v011(v008)=<span class="string">''</span>;<span class="keyword">if</span> ~v002,v012=uint32(bin2dec(v011 <span class="keyword">...</span>
-));<span class="keyword">else</span>,v012=uint32(bin2dec(v011.'));<span class="keyword">end</span>,v012=v012+65536;v000=PatternReplace(v000,v009{v010},<span class="keyword">...</span>
-v012);<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> [v000,v001,v002]=UTF8_to_unicode(v003,v004),<span class="keyword">if</span> nargin&lt;2,v004=[];<span class="keyword">end</span>,v005= nargout==1 ;
-v003=uint32(v003);[v002,v006,v007]=UTF8_to_unicode_internal(v003,v005);<span class="keyword">if</span> strcmp(v006,<span class="keyword">...</span>
-<span class="string">'success'</span>),v001=true;v000=v002;<span class="keyword">elseif</span> strcmp(v006,<span class="string">'error'</span>),v001=false;<span class="keyword">if</span> v005,error_(v004,v007),<span class="keyword">...</span>
-<span class="keyword">end</span>,v000=v003;<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=bsxfun_plus(v001,v002),<span class="keyword">try</span> v000=v001+v002;<span class="keyword">catch</span>,<span class="keyword">try</span> v000=bsxfun(@plus,v001,v002);
-<span class="keyword">catch</span>,v003=size(v001); v004=size(v002);v001=repmat(v001,max(1,v004./v003)); v002=repmat(v002,<span class="keyword">...</span>
-max(1,v003./v004));v000=v001+v002;<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=char2cellstr(v001,v002),v003=isa(v001,<span class="string">'char'</span>);v001=int32(v001);<span class="keyword">if</span> nargin&lt;2,<span class="keyword">if</span> <span class="keyword">...</span>
-any(v001==13),v001=PatternReplace(v001,int32([13 10]),int32(-10));v001(v001==13)=-10;<span class="keyword">end</span>,<span class="keyword">...</span>
-v001(v001==10)=-10;<span class="keyword">else</span>,<span class="keyword">for</span> v004=1:numel(v002),v001=PatternReplace(v001,int32(v002{v004}),<span class="keyword">...</span>
-int32(-10));<span class="keyword">end</span>,<span class="keyword">end</span>,v005=[0 find(v001==-10) numel(v001)+1];v000=cell(numel(v005)-1,1);<span class="keyword">for</span> v004=<span class="keyword">...</span>
-1:numel(v000),v006=(v005(v004 )+1);v007=(v005(v004+1)-1);v000{v004}=v001(v006:v007);<span class="keyword">end</span>,<span class="keyword">if</span> v003,<span class="keyword">...</span>
-<span class="keyword">for</span> v004=1:numel(v000),v000{v004}= char(v000{v004});<span class="keyword">end</span>,<span class="keyword">else</span>,<span class="keyword">for</span> v004=1:numel(v000),v000{v004}=<span class="keyword">...</span>
-uint32(v000{v004});<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> v000=convert_from_codepage(v000,v001),<span class="keyword">persistent</span> v002 v003,<span class="keyword">if</span> isempty(v002),v004=[338 <span class="keyword">...</span>
-140;339 156;352 138;353 154;376 159;381 142;382 158;402 131;710 136;732 152;8211 150;8212 151;
-8216 145;8217 146;8218 130;8220 147;8221 148;8222 132;8224 134;8225 135;8226 149;8230 133;8240 <span class="keyword">...</span>
-137;8249 139;8250 155;8364 128;8482 153];v002=v004(:,2);v003=v004(:,1);<span class="keyword">end</span>,<span class="keyword">if</span> nargin&gt;1 &amp;&amp; v001,<span class="keyword">...</span>
-v005=v003;v006=v002;<span class="keyword">else</span>,v005=v002;v006=v003;<span class="keyword">end</span>,v000=uint32(v000);<span class="keyword">for</span> v007=1:numel(v005),v000=<span class="keyword">...</span>
-PatternReplace(v000,v005(v007),v006(v007));<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> [v000,v001]=validate_print_to__options(v002,v001),<span class="keyword">if</span> nargin&lt;2,v001=struct;<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-~isfield(v002,<span class="string">'print_to_con'</span>),v002.print_to_con=[];<span class="keyword">end</span>,<span class="keyword">if</span> ~isfield(v002,<span class="string">'print_to_fid'</span>),<span class="keyword">...</span>
-v002.print_to_fid=[];<span class="keyword">end</span>,<span class="keyword">if</span> ~isfield(v002,<span class="string">'print_to_obj'</span>),v002.print_to_obj=[];<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-~isfield(v002,<span class="string">'print_to_fcn'</span>),v002.print_to_fcn=[];<span class="keyword">end</span>,v003=true;v000=struct;v004=<span class="keyword">...</span>
-v002.print_to_fid;<span class="keyword">if</span> isempty(v004),v000.boolean.fid=false;<span class="keyword">else</span>,v003=false;v000.boolean.fid=true;
-v000.fid=v004;<span class="keyword">for</span> v005=1:numel(v004),<span class="keyword">try</span> v006=ftell(v004(v005));<span class="keyword">catch</span>,v006=-1;<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-v004(v005)~=1 &amp;&amp; v006==-1,v001.message=[<span class="string">'Invalid print_to_fid parameter:'</span>,char(10),<span class="keyword">...</span>
-<span class="string">'should be a valid file identifier or 1.'</span>];v000=[];<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,v004=v002.print_to_obj;<span class="keyword">if</span> <span class="keyword">...</span>
-isempty(v004),v000.boolean.obj=false;<span class="keyword">else</span>,v003=false;v000.boolean.obj=true;v000.obj=v004;<span class="keyword">for</span> <span class="keyword">...</span>
-v005=1:numel(v004),<span class="keyword">try</span> v007=get(v004(v005),<span class="string">'String'</span> );set( v004(v005),<span class="string">'String'</span>,<span class="string">''</span> );set( <span class="keyword">...</span>
-v004(v005),<span class="string">'String'</span>,v007);<span class="keyword">catch</span>,v001.message=[<span class="string">'Invalid print_to_obj parameter:'</span>,char(10),<span class="keyword">...</span>
-<span class="string">'should be a handle to an object with a writeable String property.'</span>];v000=[];<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">...</span>
-v004=v002.print_to_fcn;<span class="keyword">if</span> isempty(v004),v000.boolean.fcn=false;<span class="keyword">else</span>,v003=false;<span class="keyword">try</span> <span class="keyword">for</span> v005=<span class="keyword">...</span>
-1:numel(v004),<span class="keyword">if</span> ~ismember(class(v004(v005).h),{<span class="string">'function_handle'</span>,<span class="string">'inline'</span>}) || <span class="keyword">...</span>
-numel(v004(v005).h)~=1,error(<span class="string">'trigger error'</span>),<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">catch</span>,v001.message=<span class="keyword">...</span>
-[<span class="string">'Invalid print_to_fcn parameter:'</span>,char(10),<span class="keyword">...</span>
-<span class="string">'should be a struct with the h field containing a function handle,'</span>,char(10),<span class="keyword">...</span>
-<span class="string">'anonymous function or inline function.'</span>];v000=[];<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,v004=v002.print_to_con;<span class="keyword">if</span> <span class="keyword">...</span>
-isempty(v004),v000.boolean.con=v003;<span class="keyword">else</span>,[v008,v000.boolean.con]=test_if_scalar_logical(v004);
-<span class="keyword">if</span> ~v008,v001.message=[<span class="string">'Invalid print_to_con parameter:'</span>,char(10),<span class="keyword">...</span>
-<span class="string">'should be a scalar logical.'</span>];v000=[];<span class="keyword">return</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-<span class="keyword">function</span> warning_(v001,varargin),<span class="keyword">persistent</span> v000,<span class="keyword">if</span> isempty(v000),v000=func2str(@warning_);<span class="keyword">end</span>,<span class="keyword">...</span>
-<span class="keyword">if</span> isempty(v001),v001=struct;<span class="keyword">end</span>,v001=parse_warning_error_redirect_options(v001);[v002,v003,<span class="keyword">...</span>
-v004,v005]=parse_warning_error_redirect_inputs(varargin{:});v006=struct(<span class="string">'identifier'</span>,v002,<span class="keyword">...</span>
-<span class="string">'message'</span>,v003,<span class="string">'stack'</span>,v004);<span class="keyword">if</span> v001.boolean.con,<span class="keyword">if</span> ~isempty(v002),warning(v002,<span class="string">'%s'</span>,v003),<span class="keyword">else</span>,<span class="keyword">...</span>
-warning(v003), <span class="keyword">end</span>,<span class="keyword">else</span>,<span class="keyword">if</span> ~isempty(v002),lastwarn(v003,v002); <span class="keyword">else</span>,lastwarn(v003),<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-v001.boolean.obj,v007=v003;<span class="keyword">while</span> v007(end)==10,v007(end)=[];<span class="keyword">end</span>,<span class="keyword">if</span> any(v007==10),v007=<span class="keyword">...</span>
-char2cellstr([<span class="string">'Warning: '</span> v007]);<span class="keyword">else</span>,v007=[<span class="string">'Warning: '</span> v007];<span class="keyword">end</span>,set(v001.obj,<span class="string">'String'</span>,v007),<span class="keyword">...</span>
-<span class="keyword">for</span> v008=v001.obj(:).',<span class="keyword">try</span> set(v008,<span class="string">'String'</span>,v007);<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> v001.boolean.fid || <span class="keyword">...</span>
-v001.boolean.fcn,v009=2;[v005,v004]=get_trace(v009);<span class="keyword">end</span>,<span class="keyword">if</span> v001.boolean.fid,<span class="keyword">for</span> v010=<span class="keyword">...</span>
-v001.fid(:).',<span class="keyword">try</span> fprintf(v010,<span class="string">'Warning: %s\n%s'</span>,v003,v005);<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">if</span> <span class="keyword">...</span>
-v001.boolean.fcn,<span class="keyword">if</span> ismember(v000,{v004.name}),error(<span class="string">'prevent recursion'</span>),<span class="keyword">end</span>,<span class="keyword">for</span> v011=<span class="keyword">...</span>
-v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">'data'</span>),<span class="keyword">try</span> feval(v011.h,<span class="string">'warning'</span>,v006,v011.data);<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">else</span>,<span class="keyword">...</span>
-<span class="keyword">try</span> feval(v011.h,<span class="string">'warning'</span>,v006);<span class="keyword">catch</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>,<span class="keyword">end</span>
-</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2021a</a><br></p></div><!--
+Real_email = regexprep(Email,{'*','_'},{'@','.'})</pre><h2 id="7">Test suite</h2><p>This tester is included so you can test if your own modifications would introduce any bugs. These tests form the basis for the compatibility table above. Note that functions may be different between the tester version and the normal function. Make sure to apply any modifications to both. The full tester function (including all comments) can be found <a href="https://web.archive.org/web/20221218165952/https://cdn-128.anonfiles.com/U0M9rbN9yc/d68759f2-1671383385/aaa___readfile___test.m">here</a>.</p><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2022b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% readfile
 %
@@ -842,10 +478,10 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 
 %% Syntax
 %
-%   data=readfile(filename)
-%   data=readfile(url)
-%   data=readfile(___,options)
-%   data=readfile(___,Name,Value)
+%   data = readfile(filename)
+%   data = readfile(url)
+%   data = readfile(___,options)
+%   data = readfile(___,Name,Value)
 
 %% Output arguments
 %
@@ -897,52 +533,6 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 % <html>
 % <table border=1>
 % <tr><td>
-% print_to_con
-% </td><td>
-% A logical that controls whether warnings and other output will be printed to the command window.
-% Errors can't be turned off.
-% <br><code>default=true;</code> if print_to_fid, print_to_obj, or print_to_fcn is specified then
-% <code>default=false;</code>
-% </td></tr>
-% <tr><td>
-% print_to_fid
-% </td><td>
-% The file identifier where console output will be printed. Errors and warnings will be printed
-% including the call stack. You can provide the fid for the command window (fid=1) to print
-% warnings as text. Errors will be printed to the specified file before being actually thrown.
-% <br>If print_to_fid, print_to_obj, and print_to_fcn are all empty, this will have the effect of
-% suppressing every output except errors.
-% <br>This parameter does not affect warnings or errors during input parsing.
-% <br>Array inputs are allowed.
-% <br><code>default=[];</code>
-% </td></tr>
-% <tr><td>
-% print_to_obj
-% </td><td>
-% The handle to an object with a String property, e.g. an edit field in a GUI where console output
-% will be printed. Messages with newline characters (ignoring trailing newlines) will be returned
-% as a cell array. This includes warnings and errors, which will be printed without the call stack.
-% Errors will be written to the object before the error is actually thrown.
-% <br>If print_to_fid, print_to_obj, and print_to_fcn are all empty, this will have the effect of
-% suppressing every output except errors.
-% <br>This parameter does not affect warnings or errors during input parsing.
-% <br>Array inputs are allowed.
-% <br><code>default=[];</code>
-% <tr><td>
-% print_to_fcn
-% </td><td>
-% A <code>struct</code> with a function handle, anonymous function or inline function in the
-% <code>'h'</code> field and optionally additional data in the <code>'data'</code> field. The
-% function should accept three inputs: a <code>char</code> array (either <code>'warning'</code> or
-% <code>'error'</code>), a <code>struct</code> with the message, id, and stack, and the optional
-% additional data. The function(s) will be run before the error is actually thrown.
-% <br>If print_to_fid, print_to_obj, and print_to_fcn are all empty, this will have the effect of
-% suppressing every output except errors.
-% <br>This parameter does not affect warnings or errors during input parsing.
-% <br>Array inputs are allowed.
-% <br><code>default=[];</code>
-% </td></tr>
-% <tr><td>
 % err_on_ANSI
 % </td><td>
 % If set to true, an error will be thrown when the input file is not recognized as UTF-8 encoded.
@@ -993,6 +583,14 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 % <br><code>default=[8 9 28:32 160 5760 8192:8202 8239 8287 12288];</code>
 % </td></tr>
 % <tr><td>
+% Whitespace
+% </td><td>
+% For online files, this parameter allows using <code>weboptions</code>. For releases without
+% <code>weboptions</code> and for offline files, this parameter is ignored. Note that the content
+% type option will be overwritten.
+% <br><code>default=weboptions;</code>
+% </td></tr>
+% <tr><td>
 % UseReadlinesDefaults
 % </td><td>
 % Reproduce the default behavior of readlines as closely as possible. This includes reproducing a
@@ -1001,6 +599,56 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 % <code>char(26)</code>.
 % <br>This will not convert the output to a string array.
 % <br><code>default=false;</code>
+% </td></tr>
+% <tr><td>
+% print_to_con
+% </td><td>
+% <i>An attempt is made to also use this parameter for warnings or errors during input parsing.</i>
+% <br>A logical that controls whether warnings and other output will be printed to the command
+% window. Errors can't be turned off.
+% <br><code>default=true;</code>
+% <br>Specifying <code>print_to_fid</code>, <code>print_to_obj</code>, or <code>print_to_fcn</code>
+% will change the default to <code>false</code>, unless parsing of any of the other exception
+% redirection options results in an error.
+% </td></tr>
+% <tr><td>
+% print_to_fid
+% </td><td>
+% <i>An attempt is made to also use this parameter for warnings or errors during input parsing.</i>
+% <br>The file identifier where console output will be printed. Errors and warnings will be printed
+% including the call stack. You can provide the fid for the command window (<code>fid=1</code>) to
+% print warnings as text. Errors will be printed to the specified file before the error is actually
+% thrown.
+% <br>If <code>print_to_fid</code>, <code>print_to_obj</code>, and <code>print_to_fcn</code> are
+% all empty, this will have the effect of suppressing every output except errors.
+% <br>Array inputs are allowed.
+% <br><code>default=[];</code>
+% </td></tr>
+% <tr><td>
+% print_to_obj
+% </td><td>
+% <i>An attempt is made to also use this parameter for warnings or errors during input parsing.</i>
+% <br>The handle to an object with a String property, e.g. an edit field in a GUI where console
+% output will be printed. Messages with newline characters (ignoring trailing newlines) will be
+% returned as a cell array. This includes warnings and errors, which will be printed without the
+% call stack. Errors will be written to the object before the error is actually thrown.
+% <br>If <code>print_to_fid</code>, <code>print_to_obj</code>, and <code>print_to_fcn</code> are
+% all empty, this will have the effect of suppressing every output except errors.
+% <br>Array inputs are allowed.
+% <br><code>default=[];</code>
+% <tr><td>
+% print_to_fcn
+% </td><td>
+% <i>An attempt is made to also use this parameter for warnings or errors during input parsing.</i>
+% <br>A <code>struct</code> with a function handle, anonymous function or inline function in the
+% <code>'h'</code> field and optionally additional data in the <code>'data'</code> field. The
+% function should accept three inputs: a <code>char</code> array (either <code>'warning'</code> or
+% <code>'error'</code>), a <code>struct</code> with the message, id, and stack, and the optional
+% additional data. The function(s) will be run before the error is actually thrown.
+% <br>If <code>print_to_fid</code>, <code>print_to_obj</code>, and <code>print_to_fcn</code> are
+% all empty, this will have the effect of suppressing every output except errors.
+% <br>Array inputs are allowed.
+% <br><code>default=[];</code>
 % </td></tr>
 % </table>
 % </html>
@@ -1036,7 +684,7 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 %       <code>true</code> for all files.
 %       <br>Since R2021a <code>readlines</code> also supports reading online files.</li>
 %    <li> Incorrect reading of files should only occur if the download to a temporary location
-%       fails. (<b>NB: this should be a rare occurence</b>) Modern releases of Matlab (>=R2015a)
+%       fails. (<b>NB: this should be a rare occurence</b>) Modern releases of Matlab (&ge;R2015a)
 %       are expected to read every file correctly, except for ANSI files containing special
 %       characters. GNU Octave has trouble with many ANSI files. Older releases of Matlab have the
 %       same results as Octave for ANSI files, but also have issues with some UTF-8 files.
@@ -1048,9 +696,27 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 % <table>
 % <tr>
 % <td> Test suite result </td>
-% <td style="border:2px solid black;"> Windows XP/7/10 </td>
-% <td style="border:2px solid black;"> Ubuntu 20.04 LTS </td>
-% <td style="border:2px solid black;"> MacOS 10.15 Catalina </td>
+% <td style="border:2px solid black;"> Windows </td>
+% <td style="border:2px solid black;"> Linux </td>
+% <td style="border:2px solid black;"> MacOS </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> Matlab R2022b </td>
+% <td> <it>W10 : Pass</it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
+% <td> <it>Monterey : Pass</it> </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> Matlab R2022a </td>
+% <td> <it>W10 : Pass</it> </td>
+% <td> <it></it> </td>
+% <td> <it></it> </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> Matlab R2021b </td>
+% <td> <it>W10 : Pass</it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
+% <td> <it>Monterey : Pass</it> </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> Matlab R2021a </td>
@@ -1061,8 +727,8 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 % <tr>
 % <td style="border:2px solid black;"> Matlab R2020b </td>
 % <td> <it>W10 : Pass</it> </td>
-% <td> <it></it> </td>
-% <td> <it></it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
+% <td> <it>Monterey : Pass</it> </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> Matlab R2020a </td>
@@ -1071,15 +737,39 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 % <td> <it></it> </td>
 % </tr>
 % <tr>
+% <td style="border:2px solid black;"> Matlab R2019b </td>
+% <td> <it>W10 : Pass</it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
+% <td> <it>Monterey : Pass</it> </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> Matlab R2019a </td>
+% <td> <it>W10 : Pass</it> </td>
+% <td> <it></it> </td>
+% <td> <it></it> </td>
+% </tr>
+% <tr>
 % <td style="border:2px solid black;"> Matlab R2018a </td>
 % <td> <it>W10 : Pass</it> </td>
-% <td> <it>Pass</it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
 % <td> <it></it> </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> Matlab R2017b </td>
+% <td> <it>W10 : Pass</it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
+% <td> <it>Monterey : Pass</it> </td>
+% </tr>
+% <tr>
+% <td style="border:2px solid black;"> Matlab R2016b </td>
+% <td> <it>W10 : Pass</it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
+% <td> <it>Monterey : Pass</it> </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> Matlab R2015a </td>
 % <td> <it>W10 : Pass</it> </td>
-% <td> <it>Pass</it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
 % <td> <it></it> </td>
 % </tr>
 % <tr>
@@ -1089,21 +779,21 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 % <td> <it></it> </td>
 % </tr>
 % <tr>
-% <td style="border:2px solid black;"> Matlab R2012b </td>
-% <td> <it>W10 : Pass</it> </td>
+% <td style="border:2px solid black;"> Matlab R2012a </td>
 % <td> <it></it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
 % <td> <it></it> </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> Matlab R2011a </td>
 % <td> <it>W10 : Pass</it> </td>
-% <td> <it>Pass</it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
 % <td> <it></it> </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> Matlab R2010b </td>
 % <td> <it></it> </td>
-% <td> <it>Pass</it> </td>
+% <td> <it>ubuntu_22.04 : Pass</it> </td>
 % <td> <it></it> </td>
 % </tr>
 % <tr>
@@ -1131,28 +821,34 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 % <td> <it></it> </td>
 % </tr>
 % <tr>
-% <td style="border:2px solid black;"> Octave 6.2.0 </td>
+% <td style="border:2px solid black;"> Octave 7.2.0 </td>
 % <td> <it>W10 : Pass</it> </td>
 % <td> <it></it> </td>
 % <td> <it></it> </td>
 % </tr>
 % <tr>
+% <td style="border:2px solid black;"> Octave 6.2.0 </td>
+% <td> <it>W10 : Pass</it> </td>
+% <td> <it>raspbian_11 : Pass</it> </td>
+% <td> <it>Catalina : Pass</it> </td>
+% </tr>
+% <tr>
 % <td style="border:2px solid black;"> Octave 5.2.0 </td>
 % <td> <it>W10 : Pass</it> </td>
-% <td> <it>Pass</it> </td>
+% <td> <it></it> </td>
 % <td> <it></it> </td>
 % </tr>
 % <tr>
 % <td style="border:2px solid black;"> Octave 4.4.1 </td>
 % <td> <it>W10 : Pass</it> </td>
 % <td> <it></it> </td>
-% <td> <it>Pass</it> </td>
+% <td> <it>Catalina : Pass</it> </td>
 % </tr>
 % </table>
 % </html>
 %
-%  Version: 3.0.0
-%  Date:    2020-11-07
+%  Version: 4.1.0
+%  Date:    2022-12-18
 %  Author:  H.J. Wisselink
 %  Licence: CC by-nc-sa 4.0 ( https://creativecommons.org/licenses/by-nc-sa/4.0 )
 %  Email = 'h_j_wisselink*alumnus_utwente_nl';
@@ -1160,438 +856,11 @@ v001.fcn(:).',<span class="keyword">if</span> isfield(v011,<span class="string">
 
 %% Test suite
 %
-% This tester is included so you can test if your own modifications would introduce any bugs. These
-% tests form the basis for the compatibility table above.
-% 
-% Note that some of the functions in this tester might be different from the functions included in
-% the actual function. Usually this is done to allow triggering of certain errors.
-% 
-% To save space, the tester function below was minified. The full tester function (including all comments) can be found <https://web.archive.org/web/20210519082944/https://cdn-106.anonfiles.com/p3Y1Ubw7u4/3edfdff8-1621413582/aaa___readfile___test.m here>.
-
-% Test the readfile function
-% The files were written with Notepad++ (which is how encoding was done)
-% The chars were copied from the command window with (except the UTF8-4 file):
-%    clc,fprintf('%c\n',list_of_chars)
-% 
-% one file set contains a wide variety of chars, the other only 32:255
-% one file set is UTF-8, the other is ANSI
-% one last file was written in UTF-8 containing all chars supported by the text2im function
-% 
-% the web reader is tested here as well
-% 
-% the test files are available online:
-% http://web.archive.org/web/20200602120202/
-%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_ANSI_1.txt
-% http://web.archive.org/web/20200602120203/
-%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_ANSI_2.txt
-% http://web.archive.org/web/20200602120204/
-%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_UTF-8_1.txt
-% http://web.archive.org/web/20200602120206/
-%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_UTF-8_2.txt
-% http://web.archive.org/web/20200602120207/
-%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_UTF-8_3.txt
-% http://web.archive.org/web/20201106120218/
-%                https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file_UTF-8_4.txt
-% 
-% Pass:    passes all tests
-% Partial: not 100% correct result for downloaded files or not equivalent to readlines
-% Fail:    fails any test or any percentage of correct characters not matching expectation
-%
-function v000=aaa___readfile___test(varargin),v000='pass';if nargin==0,v001=false;else,v001=...
-true;end,v002=test_syntax;if strcmp(v002,'fail'),if nargout>0,v000='fail';return,else,...
-error('syntax test failed'),end,end,v003=exist('OCTAVE_VERSION', 'builtin') ~= 0;v004{1}=[ ...
-0032:0035 0037 0039:0042 0044:0059 0061 0063 0065:0091 0093 0096:0122 0160 0171 0173 0183 ...
-0187:0189 0191:0193 0196 0200:0203 0205 0207 0209 0211 0212 0218 0224:0226 0228 0230:0235 ...
-0237:0239 0241:0244 0246 0249:0253 8211 8212 8216:8218 8220:8222 8226 8230];v004{2}=[32:126 ...
-160:255 32 32 32];v004{3}=[ 0032:0126 0161:0163 0165 0167:0172 0174:0187 0191:0214 0216:0275 ...
-0278:0289 0292 0293 0295 0298 0299 0304 0305 0308 0309 0313 0314 0317 0318 0321:0324 0327 0328 ...
-0336:0341 0344:0357 0362:0369 0376:0382 0913:0929 0931:0974 0977 0984:0989 0991:0993 8211 8212 ...
-8216:8222 8224 8225 8226 8230 8240 8249 8250 8260 8353 8356 8358 8361 8363 8364 8370 8482];
-v004{4}=[ 008986,009785,010084,128025,128512,128512,128513,128522,128550,128551,128552,128553,...
-128555,128561,128578,128583,129343];for v005=1:4,v006=num2cell(v004{v005}).';for v007=...
-1:numel(v006),v006{v007}=unicode_to_char(v006{v007});end,v004{v005}=v006;end,v008={'ANSI',...
-'UTF-8'};v009={'wide range of chars','32:255 printable chars','nearly all chars',...
-'emoji (mostly two-word UTF-16)'};v010='http://web.archive.org/web/';v011=...
-'id_/https://hjwisselink.nl/FEXsubmissiondata/68780-readfile/aaa___test_file';v012={ ...
-'20200602120202','20200602120203',NaN,NaN;'20200602120204','20200602120206','20200602120207',...
-'20201106120218'};v013=[ 100 100 0 0 ;100 100 100 100];if ~v003,if ~ifversion('==','R14SP3') && ...
-ifversion('<','R2006a'),v014=cat(3,v013,v013,[92 100 0 0 ;60 50 26 0 ]);elseif ~ifversion('==',...
-'R14SP3') && ifversion('<',8.4),v014=cat(3,v013,v013,[60 50 0 0 ;92 100 93 100]);elseif ...
-ifversion('==','R14SP3'),v014=cat(3,v013,v013,[92 100 0 0 ;100 100 100 100]);else,v014=cat(3,...
-v013,v013,[92 100 0 0 ;100 100 100 100]);end,else,v014=cat(3,v013,v013,[60 50 0 0 ;100 100 100 ...
-100]);end,global HJW___test_suit___debug_hook_data,HJW___test_suit___debug_hook_data=[];v015=...
-zeros(size(v014));clc,for v016=0:2,for v005=1:4,for v017=1:2,if v005==3 && v017==1,continue,end,...
-if v005==4 && v017==1,continue,end,try if v016==1,v018=sprintf('%s%s%s_%s_%d.txt',v010,...
-v012{v017,v005},v011,v008{v017},v005);v019=' [online file]';elseif v016==2,v018=...
-sprintf('%s%s%s_%s_%d.txt',v010,v012{v017,v005},v011,v008{v017},v005);v019=...
-' [online file, no temp download]';HJW___test_suit___debug_hook_data=struct('action','error',...
-'data',{' '});else,v018=sprintf('aaa___test_file_%s_%d.txt',v008{v017},v005);v019='';if ...
-~exist(v018,'file'),v020=v014(v017,v005,v016+1);
-fprintf('[file missing, assuming %02d%% correct: %s (%s)\n',v020,v008{v017},v009{v005});
-v015(v017,v005,v016+1)=v020;continue;end;end;v021=readfile(v018);if isequal(v021,v004{v005});
-fprintf('Read 100%% correct: %s (%s)%s\n',v008{v017},v009{v005},v019);v015(v017,v005,v016+1)=...
-100;else;if v016==1;v000='partial: downloaded file failed';end;v022=false(size(v021));for v023=...
-1:numel(v021);v022(v023)=isequal(v021{v023},v004{v005}{v023});end;v024=floor(100*mean(v022));
-fprintf('Read  %02d%% correct: %s (%s)%s\n',v024,v008{v017},v009{v005},v019);v015(v017,v005,...
-v016+1)=v024;end;catch;fprintf('[error] Read failed: %s (%s)%s\n',v008{v017},v009{v005},v019);
-if v016==1 && ~isnetavl;fprintf('        note: no internet connection available\n');end;
-v015(v017,v005,v016+1)=-1;v025=lasterror;fprintf('  [%s]\n',v025.message);end;end;end;end;if ...
-isequal(v015,v014);v026=false;fprintf('\nTest result matches expectation.\n\n');else;v026=true;
-fprintf('\nTest result did *not* match expected result.\n\n');end;try v027=...
-~isempty(which(func2str(@readlines)));catch,v027=false;end;if v027 && isnetavl;v028=...
-readfile(v018,'FailMultiword_UTF16',true);try v029=cellstr(readlines(v018));catch,v029=v028;end;
-v023=readfile(v018,'UseReadlinesDefaults',true);if isequal(v028,v029);
-fprintf('The bug in readlines() has not been fixed yet.\n');elseif ~isequal(v029,v023);
-fprintf('The replication of readfile() failed.\n');if nargout>0;v000=...
-'partial: readfile replication failed';end;end;end;if v026;if nargout>0;v000='fail';return;else;
-error('test did not match expected result');end;elseif ~v001;disp('test completed');end;if ...
-nargout==0,clear,end;end
-function v000=unicode_to_UTF16(v001),if v001<65536,v000=v001;return,end,v002=double(v001)-65536;
-v002=dec2bin(v002,20);v000=bin2dec(['110110' v002(1:10);'110111' v002(11:20)]).';end
-function varargout=debug_hook(varargin),global HJW___test_suit___debug_hook_data,if ...
-isempty(HJW___test_suit___debug_hook_data),varargout=varargin;return,end,v000=...
-HJW___test_suit___debug_hook_data(1);HJW___test_suit___debug_hook_data(1)=[];switch v000.action,...
-case 'return',varargout=v000.data;case 'warning',varargout=varargin;warning(v000.data{:}),case ...
-'error',error(v000.data{:}),case 'warning_',varargout=varargin;warning_(v000.data{:}),case ...
-'error_',error_(v000.data{:}),end,end
-function error_(v001,varargin),persistent v000,if isempty(v000),v000=func2str(@error_);end,if ...
-isempty(v001),v001=struct;end,v001=parse_warning_error_redirect_options(v001);[v002,v003,v004,...
-v005]=parse_warning_error_redirect_inputs(varargin{:});v006=struct('identifier',v002,'message',...
-v003,'stack',v004);if v001.boolean.obj,v007=v003;while v007(end)==10,v007(end)='';end,if ...
-any(v007==10),v007=char2cellstr(['Error: ' v007]);else,v007=['Error: ' v007];end,for v008=...
-v001.obj(:).',try set(v008,'String',v007);catch,end,end,end,if v001.boolean.fid,for v009=...
-v001.fid(:).',try fprintf(v009,'Error: %s\n%s',v003,v005);catch,end,end,end,if v001.boolean.fcn,...
-if ismember(v000,{v004.name}),error('prevent recursion'),end,for v010=v001.fcn(:).',if ...
-isfield(v010,'data'),try feval(v010.h,'error',v006,v010.data);catch,end,else,try feval(v010.h,...
-'error',v006);catch,end,end,end,end,rethrow(v006),end
-function varargout=findND(v000,varargin),if ~(isnumeric(v000) || islogical(v000)) || ...
-numel(v000)==0,error('HJW:findND:FirstInput',...
-'Expected first input (X) to be a non-empty numeric or logical array.'),end,switch nargin,case ...
-1,v001='first';v002=inf;case 2,v001='first';v002=varargin{1};if ~(isnumeric(v002) || ...
-islogical(v002)) || numel(v002)~=1 || any(v002<0),error('HJW:findND:SecondInput',...
-'Expected second input (K) to be a positive numeric or logical scalar.'),end,case 3,v002=...
-varargin{1};if ~(isnumeric(v002) || islogical(v002)) || numel(v002)~=1 || any(v002<0),...
-error('HJW:findND:SecondInput',...
-'Expected second input (K) to be a positive numeric or logical scalar.'),end,v001=varargin{2};
-if ~isa(v001,'char') || ~( strcmpi(v001,'first') || strcmpi(v001,'last')),...
-error('HJW:findND:ThirdInput','Third input must be either ''first'' or ''last''.'),end,v001=...
-lower(v001);otherwise,error('HJW:findND:InputNumber','Incorrect number of inputs.'),end,v003=...
-length(size(v000));if nargout>1 && nargout<v003,error('HJW:findND:Output',...
-'Incorrect number of output arguments.'),end,persistent v004,if isempty(v004),v004=...
-ifversion('<',7,'Octave','<',3);end,varargout=cell(nargout,1);if v004,if nargout>v003,[v005,...
-v006,v007]=find(v000(:));if length(v005)>v002,if strcmp(v001,'first'),v005=v005(1:v002);v007=...
-v007(1:v002);else,v005=v005((end-v002+1):end);v007=v007((end-v002+1):end);end,end,...
-[varargout{1:(end-1)}] = ind2sub(size(v000),v005);varargout{end}=v007;else,v005=find(v000);if ...
-length(v005)>v002,if strcmp(v001,'first'),v005=v005(1:v002);else,v005=v005((end-v002):end);end,...
-end,[varargout{:}] = ind2sub(size(v000),v005);end,else,if nargout>v003,[v005,v006,v007]=...
-find(v000(:),v002,v001);[varargout{1:(end-1)}] = ind2sub(size(v000),v005);varargout{end}=v007;
-else,v005=find(v000,v002,v001);[varargout{:}] = ind2sub(size(v000),v005);end,end,end
-function [v000,v001]=get_trace(v002,v001),if nargin==0,v002=1;end,if nargin<2, v001=dbstack;end,...
-v001(1:v002)=[];if ~isfield(v001,'file'),for v003=1:numel(v001),v004=v001(v003).name;if ...
-strcmp(v004(end),')'),v005=strfind(v004,'(');v006=v004( (v005(end)+1):(end-1) );v007=...
-v004(1:(v005(end)-2));else,v007=v004;[v008,v006]=fileparts(v004);end,[v008,v001(v003).file]=...
-fileparts(v007);v001(v003).name=v006;end,end,persistent v009,if isempty(v009),v009=...
-exist('OCTAVE_VERSION','builtin');end,if v009,for v003=1:numel(v001),[v008,v001(v003).file]=...
-fileparts(v001(v003).file);end,end,v010=v001;v011='>';v000=cell(1,numel(v010)-1);for v003=...
-1:numel(v010),[v012,v010(v003).file,v013]=fileparts(v010(v003).file);if v003==numel(v010),...
-v010(v003).file='';end,if strcmp(v010(v003).file,v010(v003).name),v010(v003).file='';end,if ...
-~isempty(v010(v003).file),v010(v003).file=[v010(v003).file '>'];end,v000{v003}=...
-sprintf('%c In %s%s (line %d)\n',v011,v010(v003).file,v010(v003).name,v010(v003).line);v011=' ';
-end,v000=horzcat(v000{:});end
-function v000=ifversion(v001,v002,v003,v004,v005),persistent v006 v007 v008,if isempty(v006),...
-v008=exist('OCTAVE_VERSION', 'builtin');v006=version;v009=strfind(v006,'.');if numel(v009)~=1,...
-v006(v009(2):end)='';v009=v009(1);end,v006=[str2double(v006(1:(v009-1))) ...
-str2double(v006((v009+1):end))];v006=v006(1)+v006(2)/100;v006=round(100*v006);v007={ 'R13' 605;
-'R13SP1' 605;'R13SP2' 605;'R14' 700;'R14SP1' 700;'R14SP2' 700;'R14SP3' 701;'R2006a' 702;
-'R2006b' 703;'R2007a' 704;'R2007b' 705;'R2008a' 706;'R2008b' 707;'R2009a' 708;'R2009b' 709;
-'R2010a' 710;'R2010b' 711;'R2011a' 712;'R2011b' 713;'R2012a' 714;'R2012b' 800;'R2013a' 801;
-'R2013b' 802;'R2014a' 803;'R2014b' 804;'R2015a' 805;'R2015b' 806;'R2016a' 900;'R2016b' 901;
-'R2017a' 902;'R2017b' 903;'R2018a' 904;'R2018b' 905;'R2019a' 906;'R2019b' 907;'R2020a' 908;
-'R2020b' 909;'R2021a' 910};end,if v008,if nargin==2,warning('HJW:ifversion:NoOctaveTest',...
-['No version test for Octave was provided.',char(10),...
-'This function might return an unexpected outcome.']),if isnumeric(v002),v010=...
-0.1*v002+0.9*fix(v002);v010=round(100*v010);else,v011=ismember(v007(:,1),v002);if sum(v011)~=1,...
-warning('HJW:ifversion:NotInDict','The requested version is not in the hard-coded list.'),v000=...
-NaN;return,else,v010=v007{v011,2};end,end,elseif nargin==4,[v001,v010]=deal(v003,v004);v010=...
-0.1*v010+0.9*fix(v010);v010=round(100*v010);else,[v001,v010]=deal(v004,v005);v010=...
-0.1*v010+0.9*fix(v010);v010=round(100*v010);end,else,if isnumeric(v002),v010=...
-0.1*v002+0.9*fix(v002);v010=round(100*v010);else,v011=ismember(v007(:,1),v002);if sum(v011)~=1,...
-warning('HJW:ifversion:NotInDict','The requested version is not in the hard-coded list.'),v000=...
-NaN;return,else,v010=v007{v011,2};end,end,end,switch v001,case '==', v000= v006 == v010;case ...
-'<' , v000= v006 < v010;case '<=', v000= v006 <= v010;case '>' , v000= v006 > v010;case '>=', ...
-v000= v006 >= v010;end,end
-function [v000,v001]=isnetavl(v002),if nargin==0, v003=false;else,[v004,v005]=...
-test_if_scalar_logical(v002);v003=v004&&v005;end,if v003,[v000,v001]=isnetavl___ping_via_html;
-return,end,v003=isnetavl__ICMP_is_blocked;if isempty(v003),v000=0;v001=0;else,if v003,[v000,...
-v001]=isnetavl___ping_via_html;else,[v000,v001]=isnetavl___ping_via_system;end,end,end
-function [v004,v005]=isnetavl___ping_via_html,persistent v000,if isempty(v000),try v001=...
-isempty(which(func2str(@webread)));catch,v001=true;end,v000=~v001;end,try v002=now;if v000,v003=...
-webread('http://google.com');else,v003=urlread('http://google.com');end,v004=1;v005=...
-(now-v002)*24*3600*1000;catch,v004=0;v005=0;end,end
-function [v003,v006]=isnetavl___ping_via_system,if ispc,try [v000,v001]=...
-system('ping -n 1 8.8.8.8');v002=v001(strfind(v001,' = ')+3);v002=v002(1:3);if ~strcmp(v002,...
-'110'),error('trigger error'),else,v003=1;[v004,v005]=regexp(v001,' [0-9]+ms');v006=...
-v001((v004(1)+1):(v005(1)-2));v006=str2double(v006);end,catch,v003=0;v006=0;end,elseif isunix,...
-try [v000,v001]=system('ping -c 1 8.8.8.8');v007=regexp(v001,', [01] ');if v001(v007+2)~='1',...
-error('trigger error'),else,v003=1;[v004,v005]=regexp(v001,'=[0-9.]+ ms');v006=...
-v001((v004(1)+1):(v005(1)-2));v006=str2double(v006);end,catch,v003=0;v006=0;end,else,...
-error('How did you even get Matlab to work?'),end,end
-function [v001,v002,v003]=isnetavl__ICMP_is_blocked,persistent v000,if ~isempty(v000),v001=v000;
-return,end,[v002,v003]=isnetavl___ping_via_system;if v002,v000=false;v001=false;return,end,...
-[v002,v003]=isnetavl___ping_via_html;if v002,v000=true;v001=true;return,end,v001=[];end
-function v000=parse_warning_error_redirect_options(v000),if ~isfield(v000,'boolean'),...
-v000.boolean=struct;end,if ~isfield(v000.boolean,'con') || isempty(v000.boolean.con),...
-v000.boolean.con=false;end,if ~isfield(v000.boolean,'fid') || isempty(v000.boolean.fid),...
-v000.boolean.fid=isfield(v000,'fid');end,if ~isfield(v000.boolean,'obj') || ...
-isempty(v000.boolean.obj),v000.boolean.obj=isfield(v000,'obj');end,if ~isfield(v000.boolean,...
-'fcn') || isempty(v000.boolean.fcn),v000.boolean.fcn=isfield(v000,'fcn');end,end
-function v000=PatternReplace(v001,v002,v003),v000=v001(:)';if numel(v002)==0,v004=...
-false(size(v001));elseif numel(v003)>numel(v002),error('not implemented (padding required)'),...
-else,v004=true(size(v001));for v005=1:numel(v002),v006=find(v001==v002(v005));v006=v006-v005+1;
-v006(v006<1)=[];v007=false(size(v004));v007(v006)=true;v004= v004 & v007;if ~any(v004),break,...
-end,end,end,v006=find(v004);if ~isempty(v006),for v005=1:numel(v003),v000(v006+v005-1)=...
-v003(v005);end,if numel(v003)==0,v005=0;end,if numel(v002)>v005,v006=v006(:);v008=...
-(v005+1):numel(v002);v009=bsxfun_plus(v006,v008-1);v000(v009(:))=[];end,end,end
-function [v000,v001,v002,v003]=parse_warning_error_redirect_inputs(varargin),if nargin==1,if ...
-isa(varargin{1},'struct') || isa(varargin{1},'MException'),v004=varargin{1};try v002=v004.stack;
-v003=get_trace(0,v002);catch,[v003,v002]=get_trace(3);end,v000=v004.identifier;v001=...
-v004.message;v005=...
-'Error using <a href="matlab:matlab.internal.language.introspective.errorDocCallback(';if ...
-isa(v004,'struct') && numel(v001)>numel(v005) && strcmp(v005,v001(1:numel(v005))),...
-v001(1:find(v001==10,1))='';end,else,[v003,v002]=get_trace(3);[v000,v001]=deal('',varargin{1});
-end,else,[v003,v002]=get_trace(3);if ~isempty(strfind(varargin{1},'%')),v000='';v006=...
-varargin(2:end);v001=sprintf(varargin{1},v006{:});else,v000=varargin{1};v001=varargin{2};if ...
-nargin>3,v006=varargin(3:end);v001=sprintf(v001,v006{:});end,end,end,end
-function v000=readfile(v001,varargin),if nargin<1,error('HJW:readfile:nargin',...
-'Incorrect number of input argument.'),end,if ~(nargout==0 || nargout==1),...
-error('HJW:readfile:nargout','Incorrect number of output argument.'),end,[v002,v003,v004]=...
-readfile_parse_inputs(v001,varargin{:});if ~v002,rethrow(v004),else,[v005,v006,v007,v008,v009,...
-v010,v011,v012,v013]=deal(v003.print_2__options,v003.legacy,v003.UseURLread,v003.err_on_ANSI,...
-v003.EmptyLineRule,v003.Whitespace,v003.LineEnding,v003.FailMultiword_UTF16,...
-v003.WhitespaceRule);end,if isa(v001,'string'),v001=char(v001);end,if numel(v001)>=8 && ( ...
-strcmpi(v001(1:7),'http://') || strcmpi(v001(1:8),'https://') ),if ~v006.allows_https && ...
-strcmpi(v001(1:8),'https://'),warning_(v005,'HJW:readfile:httpsNotSupported',...
-['This implementation of urlread probably doesn''t allow https requests.',char(10),...
-'The next lines of code will probably result in an error.']),end,v014=readfile_from_URL(v001,...
-v007,v005,v011,v008);if isa(v014,'cell'),v000=v014;else,v015=true;v014=...
-convert_from_codepage(v014,v015);try v004=[];[v016,v017,v018]=UTF8_to_unicode(v014);catch v004;
-if isempty(v004),v004=lasterror;end,if strcmp(v004.identifier,'HJW:UTF8_to_unicode:notUTF8'),...
-v017=false;else,error_(v005,v004),end,end,if v017,v014=unicode_to_char(v018);end,if isa(v011,...
-'double') && isempty(v011),v000=char2cellstr(v014);else,v000=char2cellstr(v014,v011);end,end,...
-else,v000=readfile_from_file(v001,v011,v005,v008);end,if ~strcmp(v009,'read') || ~strcmp(v013,...
-'preserve'),v019=cellfun('isempty',v000);for v020=find(~v019).',v021=ismember(v000{v020},v010);
-v019(v020)=all(v021);if ~strcmp(v013,'preserve'),if v019(v020),v000{v020}='';continue,end,if ...
-~v021(1) && ~v021(end),continue,end,switch v013,case 'trim',v022=find(~v021);v022=v022([1 end]);
-case 'trimleading',v022=[findND(~v021,1) numel(v021)];case 'trimtrailing',v022=[1 findND(~v021,...
-1,'last')];end,v000{v020}=v000{v020}(v022(1):v022(2));end,end,end,if ~strcmp(v009,'read'),...
-switch v009,case 'skip',v000(v019)=[];case 'error',if any(v019),error_(v005,...
-'HJW:readfile:EmptyLinesRuleError','Unexpected empty line detected on row %d',findND(v019,1)),...
-end,case 'skipleading',if v019(1),v023=1:(findND(~v019,1,'first')-1);v000(v023)=[];end,case ...
-'skiptrailing',if v019(end),v023=(1+findND(~v019,1,'last')):numel(v019);v000(v023)=[];end,end,...
-end,persistent v024,if isempty(v024),v024 = exist('OCTAVE_VERSION', 'builtin') ~= 0;end,if v012,...
-for v020=1:numel(v000),if v024,if any(v000{v020}>=240),v000{v020}=...
-replace_multiword_UTF16_by_26(v000{v020});end,else,if any(v000{v020}>=55296 & v000{v020}<=...
-56319),v000{v020}=replace_multiword_UTF16_by_26(v000{v020});end,end,end,end,end
-function v000=replace_multiword_UTF16_by_26(v001),persistent v002,if isempty(v002),v002 = ...
-exist('OCTAVE_VERSION', 'builtin') ~= 0;end,if v002,v003=UTF8_to_unicode(v001);else,v003=...
-UTF16_to_unicode(v001);end,v003(v003>=65536)=26;if v002,v000=char(unicode_to_UTF8(v003));else,...
-v000=char(unicode_to_UTF16(v003));end,end
-function v000=test_syntax,v000='pass';try readfile(struct('name','foo.txt'));v000='fail';return,...
-catch,end,try v001=readfile([mfilename '.m']);if size(v001,1)==1,...
-error('result should be nx1, not 1xn'),end,catch,v000='fail';return,end,try v002=...
-struct('print_to_con',true);v003=tempname;while exist(v003,'file'),v003=tempname;end,...
-readfile(v003,v002),catch,v004=lasterror;if ~strcmp(v004.identifier,'HJW:readfile:ReadFail'),...
-v000='fail';return,end,end,try readfile(v003,'print_to_con',true),catch,v004=lasterror;if ...
-~strcmp(v004.identifier,'HJW:readfile:ReadFail'),v000='fail';return,end,end,end
-function v000=readfile_from_file(v001,v002,v003,v004),persistent v005,if isempty(v005),v005 = ...
-exist('OCTAVE_VERSION', 'builtin') ~= 0;end,persistent v006,if isempty(v006),if v005,v007=...
-'Octave';else,v007='Matlab';end,v006=sprintf(['%s could not read the file %%s.\n',...
-'The file doesn''t exist or is not readable.\n',...
-'(Note that for online files, only http and https is supported.)'],v007);end,v008=...
-struct('identifier','HJW:readfile:ReadFail','message',sprintf(v006,v001));v009=fopen(v001,'rb');
-if v009<0,error_(v003,v008),end,v010=fread(v009,'uint8');fclose(v009);v010=v010.';try v011=[];
-v012=true;v013=UTF8_to_unicode(v010);catch v011;if isempty(v011),v011=lasterror;end,if ...
-strcmp(v011.identifier,'HJW:UTF8_to_unicode:notUTF8'),v012=false;if v004,error_(v003,...
-'HJW:readfile:notUTF8','The provided file "%s" is not a correctly encoded UTF-8 file.',v001),...
-end,else,error_(v003,v011),end,end,if v005,if v012,v000=v013;else,try v000=fileread(v001);catch,...
-error_(v003,v008),end,v000=convert_from_codepage(v000);end,else,if ispc,if v012,v000=v013;else,...
-if ifversion('<',7),try v000=fileread(v001);catch,error_(v003,v008),end,v000=...
-convert_from_codepage(v000);else,try v000=fileread(v001);catch,error_(v003,v008),end,end,end,...
-else,if v012,v000=v013;else,v000=convert_from_codepage(v010);end,end,end,if numel(v000)>=1 && ...
-double(v000(1))==65279,v000(1)=[];end,v000=unicode_to_char(v000);if isa(v002,'double') && ...
-isempty(v002),v000=char2cellstr(v000);else,v000=char2cellstr(v000,v002);end,end
-function v000=tmpname(v001,v002),if nargin<1,v001='';end,if ~isempty(v001),v001=[v001 '_'];end,...
-if nargin<2,v002='';else,if ~strcmp(v002(1),'.'),v002=['.' v002];end,end,v000=tempname;[v003,...
-v004]=fileparts(v000);v000=fullfile(v003,[v001 v004 v002]);end
-function [v000,v001,v002]=readfile_parse_inputs(v003,varargin),v000=false;v001=struct;v002=...
-struct('identifier','','message','');if ~( isa(v003,'char') || isa(v003,'string') ) || ( ...
-isa(v003,'string') && numel(v003)~=1 ) || ( isa(v003,'char') && numel(v003)==0 ),...
-v002.identifier='HJW:readfile:IncorrectInput';v002.message=...
-'The file name must be a non-empty char or a scalar string.';return,end,persistent v004 v005,if ...
-isempty(v004),v006.split = ifversion('<','R2007b','Octave','<',4);v006.allows_https=...
-ifversion('>',0,'Octave','<',0);v004.legacy=v006;try v007=isempty(which(func2str(@webread )));
-catch,v007=true;end,try v008=isempty(which(func2str(@websave )));catch,v008=true;end,try v009=...
-isempty(which(func2str(@weboptions)));catch,v009=true;end,v004.UseURLread= v007 || v008 || v009;
-v005=struct;v005.print_to_con=true;v005.print_to_fid=[];v005.print_to_obj=[];v005.print_to_fcn=...
-[];v004.print_2__options=validate_print_to__options(v005,v002);v004.err_on_ANSI=false;
-v004.FailMultiword_UTF16=false;v004.EmptyLineRule='read';v004.Whitespace=unicode_to_char([8 9 ...
-28:32 160 5760 8192:8202 8239 8287 12288]);v004.DefaultLineEnding=true;v004.LineEnding=[];
-v004.WhitespaceRule='preserve';v004.UseReadlinesDefaults=false;
-v004.ReadlinesDefaults.FailMultiword_UTF16=true;v004.ReadlinesDefaults.Whitespace=...
-sprintf(' \b\t');v010=fieldnames(v004);for v011=1:numel(v010),if ~isfield(v001,v010(v011)),...
-v004.ReadlinesDefaults.(v010{v011})=v004.(v010{v011});end,end,end,if nargin==1,v001=v004;v000=...
-true;return,end,v012= nargin==2 && isa(varargin{1},'struct');v013=mod(nargin,2)==1 && all( ...
-cellfun('isclass',varargin(1:2:end),'char' ) | cellfun('isclass',varargin(1:2:end),'string') );
-if ~( v012 || v013 ),v002.message=...
-['The second input (options) is expected to be either a struct, ',char(10),...
-'or consist of Name,Value pairs.'];v002.identifier='HJW:readfile:incorrect_input_options';
-return,end,if v013,for v014=1:2:numel(varargin),try v001.(varargin{v014})=varargin{v014+1};
-catch,v002.message='Parsing of Name,Value pairs failed.';v002.identifier=...
-'HJW:readfile:incorrect_input_NameValue';return,end,end,else,v001=varargin{1};end,v015=false;
-v016=v005;v017=v004;v010=fieldnames(v001);for v011=1:numel(v010),v018=v010{v011};v019=...
-v001.(v018);v002.identifier=['HJW:readfile:incorrect_input_opt_' lower(v018)];switch v018,case ...
-'UseURLread',[v020,v019]=test_if_scalar_logical(v019);if ~v020,v002.message=...
-'UseURLread should be either true or false';return,end,v001.UseURLread=v019 || v004.UseURLread;
-case 'err_on_ANSI',[v020,v019]=test_if_scalar_logical(v019);if ~v020,v002.message=...
-'err_on_ANSI should be either true or false';return,end,v001.err_on_ANSI=v019;case ...
-'print_to_fid',v015=true;v016.print_to_fid=v019;case 'print_to_obj',v015=true;v016.print_to_obj=...
-v019;case 'print_to_fcn',v015=true;v016.print_to_fcn=v019;case 'print_to_con',v015=true;
-v016.print_to_con=v019;case 'EmptyLineRule',if isa(v019,'string'),if numel(v019)~=1,v019=[];
-else,v019=char(v019);end,end,if isa(v019,'char'),v019=lower(v019);end,if ~isa(v019,'char') || ...
-~ismember(v019,{'read','skip','error','skipleading','skiptrailing'}),v002.message=...
-'EmptyLineRule must be a char or string with a specific value.';return,end,v001.EmptyLineRule=...
-v019;case 'Whitespace',try switch class(v019),case 'string',if numel(v019)~=1,...
-error('trigger error'),end,v019=char(v019);case 'cell',for v014=1:numel(v019),v019{v014}=...
-sprintf(v019{v014});end,v019=horzcat(v019{:});case 'char',otherwise,error('trigger error'),end,...
-v001.Whitespace=v019;catch,v002.message=...
-['The Whitespace parameter must be a char vector, string scalar or ',...
-'cellstr.\nA cellstr input must be parsable by sprintf.'];return,end,case 'WhitespaceRule',if ...
-isa(v019,'string'),if numel(v019)~=1,v019=[];else,v019=char(v019);end,end,if isa(v019,'char'),...
-v019=lower(v019);end,if ~isa(v019,'char') || ~ismember(v019,{'preserve','trim','trimleading',...
-'trimtrailing'}),v002.message='WhitespaceRule must be a char or string with a specific value.';
-return,end,v001.WhitespaceRule=v019;case 'LineEnding',v021=false;if isa(v019,'string'),v019=...
-cellstr(v019);if numel(v019)==1,v019=v019{1};end,end,if isa(v019,'cell'),try for v014=...
-1:numel(v019),v019{v014}=sprintf(v019{v014});end,catch,v021=true;end,elseif isa(v019,'char'),...
-v019={v019};else,v021=true;end,if v021 || ~iscellstr(v019),v002.message=...
-['The LineEnding parameter must be a char vector, a string or a ',...
-'cellstr.\nA cellstr or string vector input must be parsable by sprintf.'];return,end,if ...
-isequal(v019,{char(10) char(13) char([13 10])}),v001.LineEnding=[];else,v001.LineEnding=v019;
-end,case 'UseReadlinesDefaults',[v020,v019]=test_if_scalar_logical(v019);if ~v020,v002.message=...
-'UseReadlinesDefaults should be either true or false';return,end,v001.UseReadlinesDefaults=v019;
-if v001.UseReadlinesDefaults,v017=v004.ReadlinesDefaults;end,end,end,if v015,v002.identifier=...
-'HJW:readfile:incorrect_input_opt_print_to_';[v019,v002]=validate_print_to__options(v016,v002);
-if isempty(v019),return,end,v001.print_2__options=v019;else,v001.print_2__options=...
-v017.print_2__options;end,v010=fieldnames(v017);for v011=1:numel(v010),if ~isfield(v001,...
-v010(v011)),v001.(v010{v011})=v017.(v010{v011});end,end,v000=true;v002=[];end
-function v000=readfile_from_URL(v001,v002,v003,v004,v005),try v006=false;v007=...
-debug_hook(tmpname('readfile_from_URL_tmp_','.txt'));try if v002,v007=urlwrite(v001,v007);else, ...
-v007= websave(v007,v001,weboptions('ContentType','raw'));end,v000=readfile_from_file(v007,v004,...
-v003,v005);catch,v006=true;end,try if exist(v007,'file'),delete(v007);end,catch,end,if v006,...
-error('revert to urlread'),end,catch,try v008=[];if v002,v000=urlread(v001);else,v000=...
-webread(v001,weboptions('ContentType','raw'));end,catch v008;if isempty(v008),v008=lasterror;
-end,error_(v003,v008),end,end,end
-function [v000,v001]=test_if_scalar_logical(v001),persistent v002,if isempty(v002),v002={true,...
-false;1,0;'on','off';'enable','disable';'enabled','disabled'};try v002(end+1,:)=...
-eval('{"on","off"}');catch,end,end,v000=true;try if isa(v001,'char') || isa(v001,'string'),try ...
-v001=lower(v001);catch,end,end,for v003=1:size(v002,1),for v004=1:2,if isequal(v001,v002{v003,...
-v004}),v001=v002{1,v004};return,end,end,end,if isa(v001,'matlab.lang.OnOffSwitchState'),v001=...
-logical(v001);return,end,catch,end,v000=false;end
-function v000=unicode_to_char(v001,v002),persistent v003,if isempty(v003),v003 = ...
-exist('OCTAVE_VERSION', 'builtin') ~= 0;end,if nargin==1,v002=~v003;end,if v002,if ...
-all(v001<65536),v000=uint16(v001);v000=reshape(v000,1,numel(v000));else,[v004,v005,v006]=...
-unique(v001);v000=cell(1,numel(v001));for v007=1:numel(v004),v008=unicode_to_UTF16(v004(v007));
-v008=uint16(v008);v000(v006==v007)={v008};end,v000=cell2mat(v000);end,if ~v003,v000=char(v000);
-end,else,if all(v001<128),v000=char(v001);v000=reshape(v000,1,numel(v000));else,[v004,v005,...
-v006]=unique(v001);v000=cell(1,numel(v001));for v007=1:numel(v004),v008=...
-unicode_to_UTF8(v004(v007));v008=uint8(v008);v000(v006==v007)={v008};end,v000=cell2mat(v000);
-v000=char(v000);end,end,end
-function v000=unicode_to_UTF8(v001),if v001<128,v000=v001;return,end,persistent v002,if ...
-isempty(v002),v002=struct;v002.limits.lower=hex2dec({'0000','0080','0800', '10000'});
-v002.limits.upper=hex2dec({'007F','07FF','FFFF','10FFFF'});v002.scheme{2}='110xxxxx10xxxxxx';
-v002.scheme{2}=reshape(v002.scheme{2}.',8,2);v002.scheme{3}='1110xxxx10xxxxxx10xxxxxx';
-v002.scheme{3}=reshape(v002.scheme{3}.',8,3);v002.scheme{4}='11110xxx10xxxxxx10xxxxxx10xxxxxx';
-v002.scheme{4}=reshape(v002.scheme{4}.',8,4);for v003=2:4,v002.scheme_pos{v003}=...
-find(v002.scheme{v003}=='x');v002.bits(v003)=numel(v002.scheme_pos{v003});end,end,v004=...
-find(v002.limits.lower<=v001 & v001<=v002.limits.upper);v000=v002.scheme{v004};v005=...
-v002.scheme_pos{v004};v003=dec2bin(v001,v002.bits(v004));v000(v005)=v003;v000=bin2dec(v000.').';
-end
-function [v000,v001,v002]=UTF8_to_unicode_internal(v000,v003),v001='success';v002=...
-struct('identifier','HJW:UTF8_to_unicode:notUTF8','message','Input is not UTF-8.');persistent ...
-v004,if isempty(v004),v004 = exist('OCTAVE_VERSION', 'builtin') ~= 0;end,if any(v000>255),v001=...
-'error';if v003,return,end,elseif all(v000<128),return,end,for v005=4:-1:2,v006=...
-bin2dec([repmat('1',1,v005) repmat('0',1,8-v005)]);v007=v000>=v006 & v000<256;if any(v007),v007=...
-find(v007);v007=v007(:).';if numel(v000)<(max(v007)+v005-1),v001='error';if v003,return,end,...
-v007( (v007+v005-1)>numel(v000) )=[];end,if ~isempty(v007),v008=bsxfun_plus(v007 , ...
-(0:(v005-1)).' );v008=v008.';v007=v000(v008);end,else,v007=[];end,v009=[repmat('1',1,v005-1) ...
-repmat('10',1,v005)];v010=unique([1:(v005+1) 1:8:(8*v005) 2:8:(8*v005)]);if numel(v007)>0,v007=...
-unique(v007,'rows');v011=mat2cell(v007,ones(size(v007,1),1),v005);for v012=1:numel(v011),v013=...
-dec2bin(double(v011{v012}))';if ~strcmp(v009,v013(v010)),v001='error';if v003,return,end,...
-continue,end,v013(v010)='';if ~v004,v014=uint32(bin2dec(v013 ));else,v014=...
-uint32(bin2dec(v013.'));end,v000=PatternReplace(v000,v011{v012},v014);end,end,end,end
-function v000=UTF16_to_unicode(v001),persistent v002,if isempty(v002),v002 = ...
-exist('OCTAVE_VERSION', 'builtin') ~= 0;end,v001=uint32(v001);v003= v001>55295 & v001<57344;if ...
-~any(v003),v000=v001;return,end,v004= find( v001>=55296 & v001<=56319 );v005= find( v001>=56320 ...
-& v001<=57343 );try v006=v005-v004;if any(v006~=1),error('trigger error'),end,catch,...
-error('input is not valid UTF-16 encoded'),end,v007='110110110111';v008=[1:6 17:22];v003=...
-v001([v004.' v005.']);v003=unique(v003,'rows');v009=mat2cell(v003,ones(size(v003,1),1),2);v000=...
-v001;for v010=1:numel(v009),v011=dec2bin(double(v009{v010}))';if ~strcmp(v007,v011(v008)),...
-error('input is not valid UTF-16 encoded'),end,v011(v008)='';if ~v002,v012=uint32(bin2dec(v011 ...
-));else,v012=uint32(bin2dec(v011.'));end,v012=v012+65536;v000=PatternReplace(v000,v009{v010},...
-v012);end,end
-function [v000,v001,v002]=UTF8_to_unicode(v003,v004),if nargin<2,v004=[];end,v005= nargout==1 ;
-v003=uint32(v003);[v002,v006,v007]=UTF8_to_unicode_internal(v003,v005);if strcmp(v006,...
-'success'),v001=true;v000=v002;elseif strcmp(v006,'error'),v001=false;if v005,error_(v004,v007),...
-end,v000=v003;end,end
-function v000=bsxfun_plus(v001,v002),try v000=v001+v002;catch,try v000=bsxfun(@plus,v001,v002);
-catch,v003=size(v001); v004=size(v002);v001=repmat(v001,max(1,v004./v003)); v002=repmat(v002,...
-max(1,v003./v004));v000=v001+v002;end,end,end
-function v000=char2cellstr(v001,v002),v003=isa(v001,'char');v001=int32(v001);if nargin<2,if ...
-any(v001==13),v001=PatternReplace(v001,int32([13 10]),int32(-10));v001(v001==13)=-10;end,...
-v001(v001==10)=-10;else,for v004=1:numel(v002),v001=PatternReplace(v001,int32(v002{v004}),...
-int32(-10));end,end,v005=[0 find(v001==-10) numel(v001)+1];v000=cell(numel(v005)-1,1);for v004=...
-1:numel(v000),v006=(v005(v004 )+1);v007=(v005(v004+1)-1);v000{v004}=v001(v006:v007);end,if v003,...
-for v004=1:numel(v000),v000{v004}= char(v000{v004});end,else,for v004=1:numel(v000),v000{v004}=...
-uint32(v000{v004});end,end,end
-function v000=convert_from_codepage(v000,v001),persistent v002 v003,if isempty(v002),v004=[338 ...
-140;339 156;352 138;353 154;376 159;381 142;382 158;402 131;710 136;732 152;8211 150;8212 151;
-8216 145;8217 146;8218 130;8220 147;8221 148;8222 132;8224 134;8225 135;8226 149;8230 133;8240 ...
-137;8249 139;8250 155;8364 128;8482 153];v002=v004(:,2);v003=v004(:,1);end,if nargin>1 && v001,...
-v005=v003;v006=v002;else,v005=v002;v006=v003;end,v000=uint32(v000);for v007=1:numel(v005),v000=...
-PatternReplace(v000,v005(v007),v006(v007));end,end
-function [v000,v001]=validate_print_to__options(v002,v001),if nargin<2,v001=struct;end,if ...
-~isfield(v002,'print_to_con'),v002.print_to_con=[];end,if ~isfield(v002,'print_to_fid'),...
-v002.print_to_fid=[];end,if ~isfield(v002,'print_to_obj'),v002.print_to_obj=[];end,if ...
-~isfield(v002,'print_to_fcn'),v002.print_to_fcn=[];end,v003=true;v000=struct;v004=...
-v002.print_to_fid;if isempty(v004),v000.boolean.fid=false;else,v003=false;v000.boolean.fid=true;
-v000.fid=v004;for v005=1:numel(v004),try v006=ftell(v004(v005));catch,v006=-1;end,if ...
-v004(v005)~=1 && v006==-1,v001.message=['Invalid print_to_fid parameter:',char(10),...
-'should be a valid file identifier or 1.'];v000=[];return,end,end,end,v004=v002.print_to_obj;if ...
-isempty(v004),v000.boolean.obj=false;else,v003=false;v000.boolean.obj=true;v000.obj=v004;for ...
-v005=1:numel(v004),try v007=get(v004(v005),'String' );set( v004(v005),'String','' );set( ...
-v004(v005),'String',v007);catch,v001.message=['Invalid print_to_obj parameter:',char(10),...
-'should be a handle to an object with a writeable String property.'];v000=[];return,end,end,end,...
-v004=v002.print_to_fcn;if isempty(v004),v000.boolean.fcn=false;else,v003=false;try for v005=...
-1:numel(v004),if ~ismember(class(v004(v005).h),{'function_handle','inline'}) || ...
-numel(v004(v005).h)~=1,error('trigger error'),end,end,catch,v001.message=...
-['Invalid print_to_fcn parameter:',char(10),...
-'should be a struct with the h field containing a function handle,',char(10),...
-'anonymous function or inline function.'];v000=[];return,end,end,v004=v002.print_to_con;if ...
-isempty(v004),v000.boolean.con=v003;else,[v008,v000.boolean.con]=test_if_scalar_logical(v004);
-if ~v008,v001.message=['Invalid print_to_con parameter:',char(10),...
-'should be a scalar logical.'];v000=[];return,end,end,end
-function warning_(v001,varargin),persistent v000,if isempty(v000),v000=func2str(@warning_);end,...
-if isempty(v001),v001=struct;end,v001=parse_warning_error_redirect_options(v001);[v002,v003,...
-v004,v005]=parse_warning_error_redirect_inputs(varargin{:});v006=struct('identifier',v002,...
-'message',v003,'stack',v004);if v001.boolean.con,if ~isempty(v002),warning(v002,'%s',v003),else,...
-warning(v003), end,else,if ~isempty(v002),lastwarn(v003,v002); else,lastwarn(v003),end,end,if ...
-v001.boolean.obj,v007=v003;while v007(end)==10,v007(end)=[];end,if any(v007==10),v007=...
-char2cellstr(['Warning: ' v007]);else,v007=['Warning: ' v007];end,set(v001.obj,'String',v007),...
-for v008=v001.obj(:).',try set(v008,'String',v007);catch,end,end,end,if v001.boolean.fid || ...
-v001.boolean.fcn,v009=2;[v005,v004]=get_trace(v009);end,if v001.boolean.fid,for v010=...
-v001.fid(:).',try fprintf(v010,'Warning: %s\n%s',v003,v005);catch,end,end,end,if ...
-v001.boolean.fcn,if ismember(v000,{v004.name}),error('prevent recursion'),end,for v011=...
-v001.fcn(:).',if isfield(v011,'data'),try feval(v011.h,'warning',v006,v011.data);catch,end,else,...
-try feval(v011.h,'warning',v006);catch,end,end,end,end,end
+% This tester is included so you can test if your own modifications would introduce
+% any bugs. These tests form the basis for the compatibility table above. Note that
+% functions may be different between the tester version and the normal function. Make
+% sure to apply any modifications to both. The full tester function (including all
+% comments) can be found <https://web.archive.org/web/20221218165952/https://cdn-128.anonfiles.com/U0M9rbN9yc/d68759f2-1671383385/aaa___readfile___test.m here>.
 
 ##### SOURCE END #####
 --></body></html>
