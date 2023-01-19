@@ -127,8 +127,8 @@ function data=readfile(filename,varargin)
 %
 %/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%
 %|                                                                         |%
-%|  Version: 4.1.0                                                         |%
-%|  Date:    2022-12-18                                                    |%
+%|  Version: 4.1.1                                                         |%
+%|  Date:    2023-01-19                                                    |%
 %|  Author:  H.J. Wisselink                                                |%
 %|  Licence: CC by-nc-sa 4.0 ( creativecommons.org/licenses/by-nc-sa/4.0 ) |%
 %|  Email = 'h_j_wisselink*alumnus_utwente_nl';                            |%
@@ -189,7 +189,7 @@ function data=readfile(filename,varargin)
 % || Matlab 7.1 (R14SP3) | XP: Pass            |                     |                     ||
 % || Matlab 6.5 (R13)    | W10: Pass           |                     |                     ||
 % || Octave 7.2.0        | W10: Pass           |                     |                     ||
-% || Octave 6.2.0        | W10: Pass           | Raspbian 11: Pass   | Catalina: Pass      ||
+% || Octave 6.2.0        | W10: Pass           | Ubuntu 22.04: Pass  | Catalina: Pass      ||
 % || Octave 5.2.0        | W10: Pass           |                     |                     ||
 % || Octave 4.4.1        | W10: Pass           |                     | Catalina: Pass      ||
 % \=========================================================================================/
@@ -272,7 +272,7 @@ if ~strcmp(EmptyLineRule,'read') || ~strcmp(WhitespaceRule,'preserve')
         if ~strcmp(WhitespaceRule,'preserve')
             % If there is only whitespace, take a shortcut by wiping the line now.
             if L(n),data{n} = '';continue,end
-            % If the first and last chars are whitespace, triming will have no effect.
+            % If the first and last chars are whitespace, trimming will have no effect.
             if ~tmp(1) && ~tmp(end),continue,end
             % Find the indices of non-whitespace.
             switch WhitespaceRule
@@ -961,7 +961,7 @@ function [opts,replaced]=parse_NameValue(default,varargin)
 %
 % If this fails to find a match, this will throw an error with the offending name as the message.
 %
-% If there are multiple occurences of a Name, only the last Value will be returned. This is the
+% If there are multiple occurrences of a Name, only the last Value will be returned. This is the
 % same as Matlab internal functions like plot. GNU Octave also has this behavior.
 %
 % If a struct array is provided, only the first element will be used. An empty struct array will
@@ -1112,6 +1112,7 @@ for n=1:numel(named_fields_params)
     named_fields_params{n} = ['option_' named_fields_params{n}];
 end
 named_fields_ = [...
+    {'params'};
     named_fields_params;...
     {'con';'fid';'obj';'fcn'}];
 for n=1:numel(named_fields_)
@@ -1483,12 +1484,12 @@ end
 end
 function out=PatternReplace(in,pattern,rep)
 %Functionally equivalent to strrep, but extended to more data types.
-% Any input is coverted to a row vector.
+% Any input is converted to a row vector.
 
 in = reshape(in,1,[]);
 out = in;
 if numel(pattern)==0 || numel(pattern)>numel(in)
-    % Return input unchaged (apart from the reshape), as strrep does as well.
+    % Return input unchanged (apart from the reshape), as strrep does as well.
     return
 end
 
@@ -1532,7 +1533,7 @@ NonMatchL = str==' ';
 % of underscores to the length of the replacement array.
 str = regexprep(str,'\*_*',['*' repmat('_',1,numel(rep)-1)]);
 
-% We can paste in the non-matching positions. Postitions where the replacement should be inserted
+% We can paste in the non-matching positions. Positions where the replacement should be inserted
 % may or may not be correct.
 out(str==' ') = in(NonMatchL);
 
@@ -1690,7 +1691,7 @@ function [success,opts,ME]=readfile_parse_inputs(filename,varargin)
 % As input, the options should either be entered as a struct or as Name,Value pairs. Missing fields
 % are filled from the default.
 
-default = readfile_parse_inputs_defaults;
+[default,print_to_fieldnames] = readfile_parse_inputs_defaults;
 % Attempt to match the inputs to the available options. This will return a struct with the same
 % fields as the default option struct. If anything fails, an attempt will be made to parse the
 % exception redirection options anyway.
@@ -1727,7 +1728,7 @@ for k=1:numel(replaced)
     item = opts.(replaced{k});
     ME.identifier = ['HJW:readfile:incorrect_input_opt_' lower(replaced{k})];
     switch replaced{k}
-        case {'print_to_con','print_to_fid','print_to_obj','print_to_fcn'}
+        case print_to_fieldnames
             % Already checked.
         case 'UseURLread'
             [passed,item] = test_if_scalar_logical(item);
@@ -1855,9 +1856,9 @@ end
 
 success = true;ME = [];
 end
-function opts=readfile_parse_inputs_defaults
+function [opts,print_to_fieldnames]=readfile_parse_inputs_defaults
 % Create a struct with default values.
-persistent opts_
+persistent opts_ print_to_fieldnames_
 if isempty(opts_)
     legacy.allows_https = hasFeature('HTTPS_support');
     opts_.legacy = legacy;
@@ -1867,14 +1868,9 @@ if isempty(opts_)
     try no_webopts = isempty(which(func2str(@weboptions)));catch,no_webopts = true;end
     opts_.UseURLread = no_webread || no_websave || no_webopts;
     
-    opts_.print_to_con = [];
-    opts_.print_to_fid = [];
-    opts_.print_to_obj = [];
-    opts_.print_to_fcn = [];
-    opts_.print_to_params = [];
-    [opts_.print_to,print_to_option__field_names_in] = parse_print_to___get_default;
-    for n=1:numel(print_to_option__field_names_in)
-        opts_.(print_to_option__field_names_in{n})=[];
+    [opts_.print_to,print_to_fieldnames_] = parse_print_to___get_default;
+    for n=1:numel(print_to_fieldnames_)
+        opts_.(print_to_fieldnames_{n})=[];
     end
     
     opts_.err_on_ANSI = false;
@@ -1905,6 +1901,7 @@ if isempty(opts_)
     opts_.ReadlinesDefaults.Whitespace = sprintf(' \b\t');
 end
 opts = opts_;
+print_to_fieldnames = print_to_fieldnames_;
 end
 function [isLogical,val]=test_if_scalar_logical(val)
 %Test if the input is a scalar logical or convertible to it.
@@ -2191,7 +2188,7 @@ for bytes=4:-1:2
                 % Check if the byte headers match the UTF-8 standard.
                 flag = 'error';
                 if return_on_error,return,end
-                continue %leave unencoded
+                continue % Leave unencoded
             end
             bin(header_locs) = '';
             if ~isOctave
